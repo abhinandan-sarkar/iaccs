@@ -1,55 +1,64 @@
 "use client";
-import { useRouter } from "next/navigation";
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 
+const createInitialFormData = () => ({
+  // Personal Information
+  name: "",
+  father_name: "",
+  dob: "",
+  age: "",
+  gender: "",
+
+  // Address
+  address: "",
+  city: "",
+  district: "",
+  pin: "",
+  state: "",
+
+  // Contact
+  mobile: "",
+  email: "",
+  nationality: "",
+
+  // Education
+  education: "",
+  education_status: "",
+  academic_session: "",
+  college_name: "",
+  university_name: "",
+
+  // Employment (for employees)
+  employed: "",
+  employment_type: "",
+  hospital_name: "",
+  designation: "",
+  employee_id: "",
+
+  // Membership
+  membership_plan: "",
+  amount: "",
+  payment_transaction_id: "",
+});
+
+const createInitialFiles = () => ({
+  photo: null as File | null,
+  id_proof: null as File | null,
+  education_doc: null as File | null,
+  student_id: null as File | null,
+  employment_proof: null as File | null,
+  payment_proof: null as File | null,
+});
+
 export default function Membership() {
-  const [formData, setFormData] = useState({
-    // Personal Information
-    name: "",
-    father_name: "",
-    dob: "",
-    age: "",
-    gender: "",
+  const PAYMENT_CONFIG = {
+    enableTimeCheck: true,
+    windowSeconds: 300,
+  };
+  const [formData, setFormData] = useState(createInitialFormData);
 
-    // Address
-    address: "",
-    city: "",
-    district: "",
-    pin: "",
-    state: "",
-
-    // Contact
-    mobile: "",
-    email: "",
-    nationality: "",
-
-    // Education
-    education: "",
-    education_status: "",
-    academic_session: "",
-    college_name: "",
-    university_name: "",
-
-    // Employment (for employees)
-    employed: "",
-    employment_type: "",
-    hospital_name: "",
-    designation: "",
-    employee_id: "",
-
-    // Membership
-    membership_plan: "",
-    amount: "",
-  });
-
-  const [files, setFiles] = useState({
-    photo: null as File | null,
-    id_proof: null as File | null,
-    education_doc: null as File | null,
-    student_id: null as File | null,
-    employment_proof: null as File | null,
-  });
+  const [files, setFiles] = useState(createInitialFiles);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,15 +73,27 @@ export default function Membership() {
     string[]
   >([]);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-
-  const router = useRouter();
+  const [currentStep, setCurrentStep] = useState<1 | 2>(1);
+  const [paymentTimer, setPaymentTimer] = useState(PAYMENT_CONFIG.windowSeconds);
+  const [referenceNumber, setReferenceNumber] = useState("");
+  const [recordId, setRecordId] = useState("");
+  const [showThankYou, setShowThankYou] = useState(false);
+  const [thankYouData, setThankYouData] = useState<{
+    reference_number?: string;
+    membership_id?: string;
+    payment_status?: string;
+    status?: string;
+    download_url?: string;
+  } | null>(null);
 
   // Refs for scroll to field
   const formRef = useRef<HTMLFormElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const mobileRef = useRef<HTMLInputElement>(null);
-  const termsRef = useRef<HTMLInputElement>(null);
+  const paymentTransactionRef = useRef<HTMLInputElement>(null);
+  const termsRef = useRef<HTMLDivElement>(null);
+  const paymentProofSectionRef = useRef<HTMLDivElement>(null);
 
   const fileInputRefs = {
     photo: useRef<HTMLInputElement>(null),
@@ -80,6 +101,7 @@ export default function Membership() {
     education_doc: useRef<HTMLInputElement>(null),
     student_id: useRef<HTMLInputElement>(null),
     employment_proof: useRef<HTMLInputElement>(null),
+    payment_proof: useRef<HTMLInputElement>(null),
   };
 
   const membershipFee =
@@ -109,6 +131,153 @@ export default function Membership() {
     }));
   }, [applicantType, membershipFee]);
 
+  useEffect(() => {
+    if (currentStep !== 2 || paymentTimer <= 0) return;
+    const timer = setInterval(() => {
+      setPaymentTimer((prev) => Math.max(0, prev - 1));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [currentStep, paymentTimer]);
+
+  useEffect(() => {
+    const storedRef = window.localStorage.getItem("membership_reference_number");
+    const storedRecordId = window.localStorage.getItem("membership_record_id");
+    const expiresAt = window.localStorage.getItem(
+      "membership_payment_expires_at"
+    );
+    const urlRef = new URLSearchParams(window.location.search).get("ref");
+
+    if (urlRef) {
+      setReferenceNumber(urlRef);
+      setShowThankYou(true);
+      loadStatus(urlRef);
+      return;
+    }
+
+    if (storedRecordId && expiresAt) {
+      const remaining = Math.max(
+        0,
+        Math.floor((Number(expiresAt) - Date.now()) / 1000)
+      );
+      if (remaining > 0) {
+        if (storedRef) {
+          setReferenceNumber(storedRef);
+        }
+        setRecordId(storedRecordId);
+        setCurrentStep(2);
+        setPaymentTimer(remaining);
+      } else {
+        window.localStorage.removeItem("membership_reference_number");
+        window.localStorage.removeItem("membership_record_id");
+        window.localStorage.removeItem("membership_payment_expires_at");
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (currentStep === 2 && paymentTimer === 0) {
+      window.localStorage.removeItem("membership_reference_number");
+      window.localStorage.removeItem("membership_record_id");
+      window.localStorage.removeItem("membership_payment_expires_at");
+    }
+  }, [currentStep, paymentTimer]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const getPaymentExpiresAt = () => {
+    const value = window.localStorage.getItem("membership_payment_expires_at");
+    return value ? Number(value) : 0;
+  };
+
+  const isPaymentExpired =
+    PAYMENT_CONFIG.enableTimeCheck &&
+    (paymentTimer <= 0 ||
+      (typeof window !== "undefined" &&
+        getPaymentExpiresAt() > 0 &&
+        Date.now() > getPaymentExpiresAt()));
+
+  const loadStatus = async (ref: string) => {
+    try {
+      const res = await fetch(
+        `hhttp://iaccs.org.in/membership_status_check.php?ref=${encodeURIComponent(
+          ref
+        )}`
+      );
+      const json = await res.json();
+      if (json.success) {
+        setThankYouData({
+          reference_number: json.data?.reference_number,
+          membership_id: json.data?.membership_id,
+          payment_status: json.data?.payment_status,
+          status: json.data?.status,
+          download_url: json.download_url,
+        });
+      } else {
+        setThankYouData({
+          reference_number: ref,
+          payment_status: "Pending",
+          status: "Pending",
+        });
+      }
+    } catch {
+      setThankYouData({
+        reference_number: ref,
+        payment_status: "Pending",
+        status: "Pending",
+      });
+    }
+  };
+
+  const setUrlRefParam = (ref: string) => {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set("ref", ref);
+      window.history.replaceState({}, "", `${url.pathname}${url.search}`);
+    } catch {
+      // ignore
+    }
+  };
+
+  const clearUrlRefParam = () => {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("ref");
+      window.history.replaceState({}, "", `${url.pathname}${url.search}`);
+    } catch {
+      // ignore
+    }
+  };
+
+  const resetFlow = () => {
+    setShowThankYou(false);
+    setThankYouData(null);
+    setReferenceNumber("");
+    setFormData(createInitialFormData());
+    setFiles(createInitialFiles());
+    setApplicantType("");
+    setEducationalQualification([]);
+    setAcceptedTerms(false);
+    setCurrentStep(1);
+    setRecordId("");
+    setPaymentTimer(PAYMENT_CONFIG.windowSeconds);
+    setErrors({});
+    setToast(null);
+    setIsSubmitting(false);
+    try {
+      window.localStorage.removeItem("membership_reference_number");
+      window.localStorage.removeItem("membership_record_id");
+      window.localStorage.removeItem("membership_payment_expires_at");
+    } catch {
+      // ignore
+    }
+    clearUrlRefParam();
+  };
+
   // Function to scroll to element
   const scrollToElement = (element: HTMLElement | null) => {
     if (element) {
@@ -134,8 +303,8 @@ export default function Membership() {
     }
   };
 
-  // Validation - name, email, phone, documents are mandatory
-  const validateForm = () => {
+  // Validation for Step 1
+  const validateStep1 = () => {
     const newErrors: Record<string, string> = {};
     let firstErrorField: HTMLElement | null = null;
 
@@ -195,13 +364,61 @@ export default function Membership() {
     if (!acceptedTerms) {
       newErrors.terms = "You must accept the terms and conditions";
       if (!firstErrorField && termsRef.current) {
-        firstErrorField = termsRef.current as HTMLElement;
+        firstErrorField = termsRef.current;
       }
     }
 
     setErrors(newErrors);
 
     // Scroll to first error field
+    if (firstErrorField) {
+      scrollToElement(firstErrorField);
+    }
+
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Validation for Step 2 (Payment)
+  const validateStep2 = () => {
+    const newErrors: Record<string, string> = {};
+    let firstErrorField: HTMLElement | null = null;
+
+    if (
+      PAYMENT_CONFIG.enableTimeCheck &&
+      (paymentTimer <= 0 ||
+        (getPaymentExpiresAt() && Date.now() > getPaymentExpiresAt()))
+    ) {
+      setToast({
+        type: "error",
+        message:
+          "Payment window expired. Please submit the application again.",
+      });
+      return false;
+    }
+
+    if (!recordId.trim()) {
+      setToast({
+        type: "error",
+        message:
+          "Missing record id. Please submit the application again.",
+      });
+      return false;
+    }
+
+    const hasTransactionId = !!formData.payment_transaction_id.trim();
+    const hasPaymentProof = !!files.payment_proof;
+    if (!hasTransactionId && !hasPaymentProof) {
+      newErrors.payment_transaction_id =
+        "Provide Transaction ID or upload payment proof";
+      newErrors.payment_proof =
+        "Provide Transaction ID or upload payment proof";
+      if (!firstErrorField && paymentTransactionRef.current) {
+        firstErrorField = paymentTransactionRef.current;
+      }
+    }
+
+    setErrors(newErrors);
+
     if (firstErrorField) {
       scrollToElement(firstErrorField);
     }
@@ -228,6 +445,14 @@ export default function Membership() {
         return newErrors;
       });
     }
+
+    if (name === "payment_transaction_id" && value.trim()) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.payment_proof;
+        return newErrors;
+      });
+    }
   };
 
   const handleFileChange = (
@@ -248,6 +473,15 @@ export default function Membership() {
         return newErrors;
       });
     }
+
+    if (fieldName === "payment_proof" && file) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.payment_transaction_id;
+        return newErrors;
+      });
+      scrollToElement(paymentProofSectionRef.current);
+    }
   };
 
   const handleQualificationChange = (qualification: string) => {
@@ -265,7 +499,139 @@ export default function Membership() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    if (currentStep === 1) {
+      if (!validateStep1()) {
+        return;
+      }
+
+      setIsSubmitting(true);
+      setToast(null);
+
+      try {
+        const formDataToSend = new FormData();
+
+        // Add all form data (even empty strings)
+        Object.entries(formData).forEach(([key, value]) => {
+          formDataToSend.append(key, value ? value.toString() : "");
+        });
+
+        // Add educational qualifications as a string
+        formDataToSend.append("education", educationalQualification.join(", "));
+
+        // Add files if they exist
+        Object.entries(files).forEach(([key, file]) => {
+          if (file) formDataToSend.append(key, file);
+        });
+
+        // Add applicant type specific data
+        if (applicantType === "student") {
+          formDataToSend.append("membership_plan", "student");
+        } else if (applicantType === "professional") {
+          formDataToSend.append("membership_plan", "premium");
+        }
+
+        const response = await fetch(
+          "http://iaccs.org.in/membership_form_submit.php",
+          {
+            method: "POST",
+            body: formDataToSend,
+          }
+        );
+
+        if (response.ok) {
+          try {
+            const result = await response.json();
+
+            if (result.success === true) {
+              setToast({
+                type: "success",
+                message:
+                  result.message ||
+                  "Application submitted. Check your email for the QR code.",
+              });
+
+              if (result.record_id || result.reference_number) {
+                if (result.reference_number) {
+                  setReferenceNumber(result.reference_number);
+                  window.localStorage.setItem(
+                    "membership_reference_number",
+                    result.reference_number
+                  );
+                }
+                if (result.record_id) {
+                  setRecordId(String(result.record_id));
+                  window.localStorage.setItem(
+                    "membership_record_id",
+                    String(result.record_id)
+                  );
+                }
+                window.localStorage.setItem(
+                  "membership_payment_expires_at",
+                  String(Date.now() + PAYMENT_CONFIG.windowSeconds * 1000)
+                );
+              } else {
+                setToast({
+                  type: "error",
+                  message:
+                    "Missing record id from server. Please submit again.",
+                });
+                return;
+              }
+              setCurrentStep(2);
+              setPaymentTimer(PAYMENT_CONFIG.windowSeconds);
+              setErrors({});
+
+              setTimeout(() => {
+                scrollToElement(paymentProofSectionRef.current);
+              }, 200);
+
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              });
+            } else {
+              let errorMessage =
+                result.error ||
+                result.message ||
+                "Failed to submit application. Please try again.";
+              if (result.errors) {
+                const errorMessages = Object.values(result.errors).filter(Boolean);
+                if (errorMessages.length > 0) {
+                  errorMessage = errorMessages.join(". ");
+                }
+              }
+              setToast({
+                type: "error",
+                message: errorMessage,
+              });
+            }
+          } catch {
+            setToast({
+              type: "error",
+              message:
+                "Unexpected server response. Please try submitting again.",
+            });
+          }
+        } else {
+          setToast({
+            type: "error",
+            message: `Server error: ${response.status}. Please try again.`,
+          });
+        }
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        setToast({
+          type: "error",
+          message: "Network error. Please check your connection and try again.",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+
+      return;
+    }
+
+    if (!validateStep2()) {
       return;
     }
 
@@ -274,29 +640,19 @@ export default function Membership() {
 
     try {
       const formDataToSend = new FormData();
+      formDataToSend.append("action", "payment");
+      formDataToSend.append("record_id", recordId);
+      formDataToSend.append(
+        "payment_transaction_id",
+        formData.payment_transaction_id || ""
+      );
 
-      // Add all form data (even empty strings)
-      Object.entries(formData).forEach(([key, value]) => {
-        formDataToSend.append(key, value ? value.toString() : "");
-      });
-
-      // Add educational qualifications as a string
-      formDataToSend.append("education", educationalQualification.join(", "));
-
-      // Add files if they exist
-      Object.entries(files).forEach(([key, file]) => {
-        if (file) formDataToSend.append(key, file);
-      });
-
-      // Add applicant type specific data
-      if (applicantType === "student") {
-        formDataToSend.append("membership_plan", "student");
-      } else if (applicantType === "professional") {
-        formDataToSend.append("membership_plan", "premium");
+      if (files.payment_proof) {
+        formDataToSend.append("payment_proof", files.payment_proof);
       }
 
       const response = await fetch(
-        "https://iaccs.org.in/membership_form_submit.php",
+        "http://iaccs.org.in/membership_form_submit.php",
         {
           method: "POST",
           body: formDataToSend,
@@ -304,132 +660,54 @@ export default function Membership() {
       );
 
       if (response.ok) {
-        try {
-          const result = await response.json();
-          console.log("result", result);
+        const result = await response.json();
 
-          if (result.success || result.message) {
-            // setToast({
-            //   type: 'success',
-            //   message: "Application submitted successfully!"
-            // });
+        if (result.success === true) {
+          window.localStorage.removeItem("membership_reference_number");
+          window.localStorage.removeItem("membership_record_id");
+          window.localStorage.removeItem("membership_payment_expires_at");
 
-            if (result?.redirect_url === "") {
-              setToast({
-                type: "success",
-                message: "Application submitted successfully!",
-              });
-            } else {
-              router.push(result?.redirect_url);
-            }
+          const refFromResponse =
+            result.reference_number ||
+            referenceNumber ||
+            (result.redirect_url
+              ? (() => {
+                  try {
+                    return (
+                      new URL(
+                        result.redirect_url,
+                        window.location.origin
+                      ).searchParams.get("ref") || ""
+                    );
+                  } catch {
+                    return "";
+                  }
+                })()
+              : "");
 
-            // Scroll to top to show success toast
-            window.scrollTo({
-              top: 0,
-              behavior: "smooth",
-            });
-
-            // Reset form
-            setFormData({
-              name: "",
-              father_name: "",
-              dob: "",
-              age: "",
-              gender: "",
-              address: "",
-              city: "",
-              district: "",
-              pin: "",
-              state: "",
-              mobile: "",
-              email: "",
-              nationality: "",
-              education: "",
-              education_status: "",
-              academic_session: "",
-              college_name: "",
-              university_name: "",
-              employed: "",
-              employment_type: "",
-              hospital_name: "",
-              designation: "",
-              employee_id: "",
-              membership_plan: "",
-              amount: "",
-            });
-
-            setFiles({
-              photo: null,
-              id_proof: null,
-              education_doc: null,
-              student_id: null,
-              employment_proof: null,
-            });
-
-            setEducationalQualification([]);
-            setAcceptedTerms(false);
-            setApplicantType("");
-          } else {
-            setToast({
-              type: "error",
-              message:
-                result.error ||
-                "Failed to submit application. Please try again.",
-            });
+          if (refFromResponse) {
+            setReferenceNumber(refFromResponse);
+            setUrlRefParam(refFromResponse);
+            await loadStatus(refFromResponse);
           }
-        } catch (jsonError) {
-          // If response is not JSON, assume success
+
+          setShowThankYou(true);
+          setToast(null);
+        } else {
+          let errorMessage =
+            result.error ||
+            result.message ||
+            "Failed to submit payment. Please try again.";
+          if (result.errors) {
+            const errorMessages = Object.values(result.errors).filter(Boolean);
+            if (errorMessages.length > 0) {
+              errorMessage = errorMessages.join(". ");
+            }
+          }
           setToast({
-            type: "success",
-            message: "Application submitted successfully!",
+            type: "error",
+            message: errorMessage,
           });
-
-          // Scroll to top to show success toast
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          });
-
-          // Reset form
-          setFormData({
-            name: "",
-            father_name: "",
-            dob: "",
-            age: "",
-            gender: "",
-            address: "",
-            city: "",
-            district: "",
-            pin: "",
-            state: "",
-            mobile: "",
-            email: "",
-            nationality: "",
-            education: "",
-            education_status: "",
-            academic_session: "",
-            college_name: "",
-            university_name: "",
-            employed: "",
-            employment_type: "",
-            hospital_name: "",
-            designation: "",
-            employee_id: "",
-            membership_plan: "",
-            amount: "",
-          });
-
-          setFiles({
-            photo: null,
-            id_proof: null,
-            education_doc: null,
-            student_id: null,
-            employment_proof: null,
-          });
-
-          setEducationalQualification([]);
-          setAcceptedTerms(false);
-          setApplicantType("");
         }
       } else {
         setToast({
@@ -438,7 +716,7 @@ export default function Membership() {
         });
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error("Error submitting payment:", error);
       setToast({
         type: "error",
         message: "Network error. Please check your connection and try again.",
@@ -448,167 +726,108 @@ export default function Membership() {
     }
   };
 
+  const paymentBarcodeSrc =
+    formData.amount === "100"
+      ? "/assets/images/100.jpeg"
+      : formData.amount === "50"
+      ? "/assets/images/50.jpeg"
+      : null;
+
+  const effectiveRef =
+    thankYouData?.reference_number || referenceNumber || undefined;
+
   return (
     <>
-      {/* Toast Notification */}
-      {toast && (
-        <div className="fixed top-24 right-4 z-50 animate-slide-in">
-          <div
-            className={`rounded-lg shadow-lg p-4 max-w-sm ${
-              toast.type === "success"
-                ? "bg-green-50 border border-green-200"
-                : "bg-red-50 border border-red-200"
-            }`}
-          >
-            <div className="flex items-start">
-              <div
-                className={`flex-shrink-0 w-6 h-6 ${
-                  toast.type === "success" ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {toast.type === "success" ? (
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                )}
-              </div>
-              <div className="ml-3">
-                <p
-                  className={`text-sm font-medium ${
-                    toast.type === "success" ? "text-green-800" : "text-red-800"
-                  }`}
-                >
-                  {toast.message}
-                </p>
-              </div>
-              <button
-                onClick={() => setToast(null)}
-                className="ml-auto -mx-1.5 -my-1.5 rounded-lg p-1.5 inline-flex h-8 w-8 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
-              >
-                <span className="sr-only">Close</span>
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ================= ORIGINAL BANNER ================= */}
-      <header className="relative mt-20 w-full bg-[url(/assets/images/banner-img.png)] bg-cover bg-center py-28">
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="relative mx-auto max-w-6xl px-6 md:px-[110px]">
-          <h1 className="text-5xl font-bold text-white">
-            Membership Application
-          </h1>
-          <p className="mt-3 text-lg text-white">
-            Please fill the form carefully in BLOCK letters.
-          </p>
-        </div>
-      </header>
-
       {/* ================= ENHANCED FORM ================= */}
-      <section className="bg-gray-50 px-6 py-20 md:px-[110px]">
-        <div className="mx-auto max-w-6xl space-y-8">
-          {/* Progress Indicator */}
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-semibold">1</span>
+      <section className="bg-gray-50 px-4 sm:px-6 lg:px-[110px] py-6 sm:py-8 mt-16 md:mt-[79px]">
+        <h1
+          className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-5"
+          style={{ fontFamily: "Georgia, serif" }}
+        >
+          {showThankYou ? "Thank You" : "Membership Application"}
+        </h1>
+        <div className="mx-auto max-w-6xl space-y-6 sm:space-y-8">
+          {showThankYou ? (
+            <ThankYouSection
+              referenceNumber={effectiveRef}
+              data={thankYouData}
+              onRefresh={
+                effectiveRef ? () => loadStatus(effectiveRef) : undefined
+              }
+              onNewApplication={resetFlow}
+            />
+          ) : (
+            <>
+              {/* Progress Indicator */}
+              <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                      <span className="text-white font-semibold">1</span>
+                    </div>
+                    <span className="font-medium text-gray-700">
+                      Personal Info
+                    </span>
+                  </div>
+
+                  <div className="hidden sm:block h-1 w-10 md:w-24 bg-gray-200"></div>
+
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        applicantType ? "bg-blue-600" : "bg-gray-200"
+                      }`}
+                    >
+                      <span
+                        className={`font-semibold ${
+                          applicantType ? "text-white" : "text-gray-500"
+                        }`}
+                      >
+                        2
+                      </span>
+                    </div>
+                    <span
+                      className={`font-medium ${
+                        applicantType ? "text-gray-700" : "text-gray-400"
+                      }`}
+                    >
+                      Details
+                    </span>
+                  </div>
+
+                  <div className="hidden sm:block h-1 w-10 md:w-24 bg-gray-200"></div>
+
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        applicantType ? "bg-blue-600" : "bg-gray-200"
+                      }`}
+                    >
+                      <span
+                        className={`font-semibold ${
+                          applicantType ? "text-white" : "text-gray-500"
+                        }`}
+                      >
+                        3
+                      </span>
+                    </div>
+                    <span
+                      className={`font-medium ${
+                        applicantType ? "text-gray-700" : "text-gray-400"
+                      }`}
+                    >
+                      Documents
+                    </span>
+                  </div>
                 </div>
-                <span className="font-medium text-gray-700">Personal Info</span>
               </div>
 
-              <div className="h-1 w-24 bg-gray-200"></div>
-
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    applicantType ? "bg-blue-600" : "bg-gray-200"
-                  }`}
-                >
-                  <span
-                    className={`font-semibold ${
-                      applicantType ? "text-white" : "text-gray-500"
-                    }`}
-                  >
-                    2
-                  </span>
-                </div>
-                <span
-                  className={`font-medium ${
-                    applicantType ? "text-gray-700" : "text-gray-400"
-                  }`}
-                >
-                  Details
-                </span>
-              </div>
-
-              <div className="h-1 w-24 bg-gray-200"></div>
-
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    applicantType ? "bg-blue-600" : "bg-gray-200"
-                  }`}
-                >
-                  <span
-                    className={`font-semibold ${
-                      applicantType ? "text-white" : "text-gray-500"
-                    }`}
-                  >
-                    3
-                  </span>
-                </div>
-                <span
-                  className={`font-medium ${
-                    applicantType ? "text-gray-700" : "text-gray-400"
-                  }`}
-                >
-                  Documents
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+              <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+                {currentStep === 1 && (
+                  <>
             {/* PERSONAL INFORMATION */}
-            <div className="rounded-xl bg-white p-8 shadow-md border border-gray-100">
-              <h2 className="mb-8 pb-3 border-b text-2xl font-bold text-gray-800">
+            <div className="rounded-xl bg-white p-5 sm:p-8 shadow-md border border-gray-100">
+              <h2 className="mb-6 sm:mb-8 pb-2 sm:pb-3 border-b text-xl sm:text-2xl font-bold text-gray-800">
                 Personal Information
               </h2>
 
@@ -647,7 +866,7 @@ export default function Membership() {
 
                 <div className="md:col-span-2">
                   <Label>Gender</Label>
-                  <div className="flex gap-8 mt-2">
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 sm:gap-8 mt-2">
                     {["Male", "Female", "Transgender"].map((option) => (
                       <Radio
                         key={option}
@@ -665,8 +884,8 @@ export default function Membership() {
             </div>
 
             {/* ADDRESS */}
-            <div className="rounded-xl bg-white p-8 shadow-md border border-gray-100">
-              <h2 className="mb-8 pb-3 border-b text-2xl font-bold text-gray-800">
+            <div className="rounded-xl bg-white p-5 sm:p-8 shadow-md border border-gray-100">
+              <h2 className="mb-6 sm:mb-8 pb-2 sm:pb-3 border-b text-xl sm:text-2xl font-bold text-gray-800">
                 Residential Address
               </h2>
 
@@ -702,19 +921,74 @@ export default function Membership() {
                   onChange={handleChange}
                   placeholder="Enter PIN code"
                 />
-                <Input
-                  label="State"
-                  name="state"
-                  value={formData.state}
-                  onChange={handleChange}
-                  placeholder="Enter state"
-                />
+                    <div className="w-full">
+                      <Label>State</Label>
+                      <div className="relative">
+                        <select
+                          name="state"
+                          value={formData.state}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-white border border-gray-300 yfocus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none transition-colors"
+                        >
+                          <option value="">Select state</option>
+                          <option value="AN">Andaman and Nicobar Islands</option>
+                          <option value="AP">Andhra Pradesh</option>
+                          <option value="AR">Arunachal Pradesh</option>
+                          <option value="AS">Assam</option>
+                          <option value="BR">Bihar</option>
+                          <option value="CH">Chandigarh</option>
+                          <option value="CG">Chhattisgarh</option>
+                          <option value="DN">Dadra and Nagar Haveli and Daman and Diu</option>
+                          <option value="DL">Delhi</option>
+                          <option value="GA">Goa</option>
+                          <option value="GJ">Gujarat</option>
+                          <option value="HR">Haryana</option>
+                          <option value="HP">Himachal Pradesh</option>
+                          <option value="JK">Jammu and Kashmir</option>
+                          <option value="JH">Jharkhand</option>
+                          <option value="KA">Karnataka</option>
+                          <option value="KL">Kerala</option>
+                          <option value="LA">Ladakh</option>
+                          <option value="LD">Lakshadweep</option>
+                          <option value="MP">Madhya Pradesh</option>
+                          <option value="MH">Maharashtra</option>
+                          <option value="MN">Manipur</option>
+                          <option value="ML">Meghalaya</option>
+                          <option value="MZ">Mizoram</option>
+                          <option value="NL">Nagaland</option>
+                          <option value="OR">Odisha</option>
+                          <option value="PB">Punjab</option>
+                          <option value="RJ">Rajasthan</option>
+                          <option value="SK">Sikkim</option>
+                          <option value="TN">Tamil Nadu</option>
+                          <option value="TS">Telangana</option>
+                          <option value="TR">Tripura</option>
+                          <option value="UP">Uttar Pradesh</option>
+                          <option value="UK">Uttarakhand</option>
+                          <option value="WB">West Bengal</option>
+                        </select>
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
               </div>
             </div>
 
             {/* CONTACT */}
-            <div className="rounded-xl bg-white p-8 shadow-md border border-gray-100">
-              <h2 className="mb-8 pb-3 border-b text-2xl font-bold text-gray-800">
+            <div className="rounded-xl bg-white p-5 sm:p-8 shadow-md border border-gray-100">
+              <h2 className="mb-6 sm:mb-8 pb-2 sm:pb-3 border-b text-xl sm:text-2xl font-bold text-gray-800">
                 Contact Details
               </h2>
 
@@ -731,7 +1005,7 @@ export default function Membership() {
                 />
                 <div>
                   <Label>Nationality</Label>
-                  <div className="flex gap-8 mt-2">
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 sm:gap-8 mt-2">
                     {["Indian", "Others"].map((option) => (
                       <Radio
                         key={option}
@@ -762,15 +1036,15 @@ export default function Membership() {
             </div>
 
             {/* EDUCATION */}
-            <div className="rounded-xl bg-white p-8 shadow-md border border-gray-100">
-              <h2 className="mb-8 pb-3 border-b text-2xl font-bold text-gray-800">
+            <div className="rounded-xl bg-white p-5 sm:p-8 shadow-md border border-gray-100">
+              <h2 className="mb-6 sm:mb-8 pb-2 sm:pb-3 border-b text-xl sm:text-2xl font-bold text-gray-800">
                 Educational Details
               </h2>
 
               <div className="space-y-6">
                 <div>
                   <Label>Educational Qualification</Label>
-                  <div className="flex gap-8 mt-2">
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 sm:gap-8 mt-2">
                     {["Diploma", "Bachelor", "Masters"].map((qual) => (
                       <Checkbox
                         key={qual}
@@ -784,7 +1058,7 @@ export default function Membership() {
 
                 <div>
                   <Label>Status</Label>
-                  <div className="flex gap-8 mt-2">
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 sm:gap-8 mt-2">
                     {["Pursuing", "Completed"].map((option) => (
                       <Radio
                         key={option}
@@ -833,8 +1107,8 @@ export default function Membership() {
             </div>
 
             {/* APPLICANT TYPE */}
-            <div className="rounded-xl bg-white p-8 shadow-md border border-gray-100">
-              <h2 className="mb-8 pb-3 border-b text-2xl font-bold text-gray-800">
+            <div className="rounded-xl bg-white p-5 sm:p-8 shadow-md border border-gray-100">
+              <h2 className="mb-6 sm:mb-8 pb-2 sm:pb-3 border-b text-xl sm:text-2xl font-bold text-gray-800">
                 Applicant Details
               </h2>
 
@@ -866,7 +1140,12 @@ export default function Membership() {
                           : "bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       }`}
                       value={applicantType}
-                      onChange={(e) => setApplicantType(e.target.value as any)}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setApplicantType(
+                          v === "student" || v === "professional" ? v : ""
+                        );
+                      }}
                       disabled={!!formData.education_status}
                     >
                       <option value="">Select applicant type</option>
@@ -900,13 +1179,13 @@ export default function Membership() {
                 <div>
                   <Label>Membership Fee</Label>
                   <div className="relative">
-                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-700 font-medium">
+                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-700 font-medium flex items-center h-[44px]">
                       ₹
                     </div>
                     <input
                       value={membershipFee ? `₹${membershipFee}` : ""}
                       disabled
-                      className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg font-semibold text-gray-700"
+                      className="w-full pl-12  h-[44px]  bg-gray-50 border border-gray-300 rounded-lg font-semibold text-gray-700"
                     />
                   </div>
                 </div>
@@ -915,8 +1194,8 @@ export default function Membership() {
 
             {/* EMPLOYMENT */}
             {applicantType === "professional" && (
-              <div className="rounded-xl bg-white p-8 shadow-md border border-gray-100">
-                <h2 className="mb-8 pb-3 border-b text-2xl font-bold text-gray-800">
+              <div className="rounded-xl bg-white p-5 sm:p-8 shadow-md border border-gray-100">
+                <h2 className="mb-6 sm:mb-8 pb-2 sm:pb-3 border-b text-xl sm:text-2xl font-bold text-gray-800">
                   Employment Details
                 </h2>
 
@@ -959,14 +1238,13 @@ export default function Membership() {
                 </div>
               </div>
             )}
-
             {/* DOCUMENT UPLOAD */}
-            <div className="rounded-xl bg-white p-8 shadow-md border border-gray-100">
-              <h2 className="mb-8 pb-3 border-b text-2xl font-bold text-gray-800">
+            <div className="rounded-xl bg-white p-5 sm:p-8 shadow-md border border-gray-100">
+              <h2 className="mb-6 sm:mb-8 pb-2 sm:pb-3 border-b text-xl sm:text-2xl font-bold text-gray-800">
                 Document Upload
               </h2>
 
-              <div className="space-y-8">
+              <div className="space-y-6 sm:space-y-8">
                 {/* Photo Upload */}
                 <div className="space-y-2">
                   <Label>Recent Passport Size Photo *</Label>
@@ -1036,80 +1314,296 @@ export default function Membership() {
                 )} */}
               </div>
             </div>
+              </>
+            )}
 
-            {/* TERMS AND SUBMIT */}
-            <div className="bg-white rounded-xl p-8 shadow-md border border-gray-100">
-              <div className="space-y-8">
-                <div
-                  className="p-6 bg-blue-50 rounded-lg border border-blue-100"
-                  ref={termsRef as any}
-                >
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={acceptedTerms}
-                      onChange={(e) => {
-                        setAcceptedTerms(e.target.checked);
-                        if (errors.terms) {
-                          setErrors((prev) => ({ ...prev, terms: "" }));
-                        }
-                      }}
-                      className="mt-1 w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <span className="text-gray-700">
-                      I hereby declare that the information provided above is
-                      true and correct to the best of my knowledge. I agree to
-                      abide by the rules and regulations of the association. *
-                    </span>
-                  </label>
-                  {errors.terms && (
-                    <p className="text-red-500 text-sm mt-2">{errors.terms}</p>
-                  )}
+            {/* STEP 1: TERMS AND SUBMIT */}
+            {currentStep === 1 ? (
+              <div className="bg-white rounded-xl p-5 sm:p-8 shadow-md border border-gray-100">
+                <div className="space-y-6 sm:space-y-8">
+                  <div
+                    className="p-6 bg-blue-50 rounded-lg border border-blue-100"
+                      ref={termsRef}
+                  >
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={acceptedTerms}
+                        onChange={(e) => {
+                          setAcceptedTerms(e.target.checked);
+                          if (errors.terms) {
+                            setErrors((prev) => ({ ...prev, terms: "" }));
+                          }
+                        }}
+                        className="mt-1 w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span className="text-gray-700">
+                        I hereby declare that the information provided above is
+                        true and correct to the best of my knowledge. I agree to
+                        abide by the rules and regulations of the association. *
+                      </span>
+                    </label>
+                    {errors.terms && (
+                      <p className="text-red-500 text-sm mt-2">
+                        {errors.terms}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="text-center">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className={`w-full sm:w-auto px-8 sm:px-16 py-4 font-semibold rounded-full border-2 border-dashed border-black transition ${
+                        isSubmitting
+                          ? "opacity-60 cursor-not-allowed"
+                          : "hover:opacity-90"
+                      }`}
+                    >
+                      {isSubmitting ? "Submitting..." : "Submit Application"}
+                    </button>
+                    <p className="mt-4 text-sm text-gray-500">
+                      * Required fields: Name, Email, Mobile Number, Photo,
+                      Education Document, and Terms Acceptance
+                    </p>
+                  </div>
                 </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <div className="flex flex-col gap-2 text-center">
+                  <p className="text-sm font-semibold text-green-700">
+                    Step 1 completed
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    We sent a payment QR to your email. Complete payment and
+                    submit the details below.
+                  </p>
+                  {/* {referenceNumber && (
+                    <p className="text-sm text-gray-700">
+                      Reference Number:{" "}
+                      <span className="font-semibold">{referenceNumber}</span>
+                    </p>
+                  )} */}
+                </div>
+              </div>
+            )}
 
-                <div className="text-center">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className={`px-16 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 shadow-lg transform hover:-translate-y-0.5 ${
-                      isSubmitting
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:from-blue-700 hover:to-blue-800 hover:shadow-xl"
+            {/* STEP 2: PAYMENT DETAILS */}
+            {currentStep === 2 ? (
+              <div className="rounded-xl bg-white p-5 sm:p-8 shadow-md border border-gray-100">
+                <div className="flex flex-col items-center text-center gap-3 mb-6">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+                    Payment Confirmation
+                  </h2>
+                  <div
+                    className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center text-base sm:text-lg font-semibold shadow-inner border ${
+                      paymentTimer > 0
+                        ? "border-green-300 bg-green-50 text-green-700"
+                        : "border-red-300 bg-red-50 text-red-700"
                     }`}
                   >
-                    {isSubmitting ? "Submitting..." : "Submit Application"}
+                    {paymentTimer > 0
+                      ? formatTime(paymentTimer)
+                      : "Expired"}
+                  </div>
+                </div>
+
+                {paymentBarcodeSrc && (
+                  <div className="mb-8">
+                    <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 flex flex-col items-center gap-3">
+                      <p className="text-sm text-gray-700 font-medium">
+                        Scan to pay (₹{formData.amount})
+                      </p>
+                      <img
+                        src={paymentBarcodeSrc}
+                        alt="Payment QR"
+                        className="w-48 h-48 sm:w-56 sm:h-56 object-contain rounded-md shadow-sm"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid gap-6 md:grid-cols-2">
+                  <input type="hidden" name="record_id" value={recordId} />
+                  <input
+                    type="hidden"
+                    name="selected_amount"
+                    value={formData.amount}
+                  />
+                  <div className="md:col-span-2">
+                    <Input
+                      label="Transaction ID"
+                      name="payment_transaction_id"
+                      value={formData.payment_transaction_id}
+                      onChange={handleChange}
+                      placeholder="Enter Transaction ID"
+                      error={errors.payment_transaction_id}
+                      ref={paymentTransactionRef}
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg text-sm text-gray-700 flex items-center justify-center text-center">
+                      OR
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 space-y-2" ref={paymentProofSectionRef}>
+                  <Label>Upload Screenshot (Image/PDF)</Label>
+                  <FileUpload
+                    id="file-upload-payment-proof"
+                    ref={fileInputRefs.payment_proof}
+                    onChange={(e) => handleFileChange("payment_proof", e)}
+                    acceptedTypes=".pdf,.jpg,.jpeg,.png"
+                    fileName={files.payment_proof?.name}
+                    error={errors.payment_proof}
+                  />
+                </div>
+
+                <div className="text-center mt-8">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || isPaymentExpired}
+                      className={`w-full sm:w-auto px-8 sm:px-16 py-4 font-semibold rounded-full border-2 border-dashed border-black transition ${
+                        isSubmitting || isPaymentExpired
+                          ? "opacity-60 cursor-not-allowed"
+                          : "hover:opacity-90"
+                      }`}
+                    >
+                    {isSubmitting ? "Submitting..." : "Submit Payment"}
                   </button>
                   <p className="mt-4 text-sm text-gray-500">
-                    * Required fields: Name, Email, Mobile Number, Photo, Education Document, and Terms Acceptance
+                    * Provide Transaction ID or Screenshot to confirm payment.
                   </p>
                 </div>
               </div>
-            </div>
-          </form>
+            ) : (
+              <div className="rounded-xl bg-white p-6 shadow-md border border-gray-100 text-sm text-gray-600 text-center">
+                Complete Step 1 to unlock the payment section.
+              </div>
+            )}
+              </form>
+            </>
+          )}
         </div>
       </section>
 
-      <style jsx>{`
-        @keyframes slide-in {
-          from {
-            transform: translateX(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-
-        .animate-slide-in {
-          animation: slide-in 0.3s ease-out;
-        }
-      `}</style>
     </>
   );
 }
 
 /* ================= ENHANCED REUSABLE UI ================= */
+
+function ThankYouSection({
+  referenceNumber,
+  data,
+  onRefresh,
+  onNewApplication,
+}: {
+  referenceNumber?: string;
+  data: {
+    reference_number?: string;
+    membership_id?: string;
+    payment_status?: string;
+    status?: string;
+    download_url?: string;
+  } | null;
+  onRefresh?: () => void | Promise<void>;
+  onNewApplication: () => void;
+}) {
+  return (
+    <div className="bg-white rounded-xl p-6 sm:p-10 shadow-md border border-gray-100">
+      <div className="flex flex-col items-center text-center gap-4">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-green-100 flex items-center justify-center">
+          <svg
+            viewBox="0 0 24 24"
+            className="w-8 h-8 sm:w-10 sm:h-10 text-green-700"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.5}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M20 6L9 17l-5-5"
+            />
+          </svg>
+        </div>
+
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          Thank you for your submission
+        </h2>
+        <p className="text-gray-600 max-w-2xl">
+          We have received your membership application. Keep your reference
+          number for tracking.
+        </p>
+
+        {referenceNumber ? (
+          <div className="mt-2 rounded-lg bg-gray-50 border border-gray-200 px-6 py-4 w-full max-w-2xl">
+            <p className="text-sm text-gray-600">Reference Number</p>
+            <p className="text-xl font-semibold text-gray-900 break-all">
+              {referenceNumber}
+            </p>
+          </div>
+        ) : (
+          <div className="mt-2 rounded-lg bg-yellow-50 border border-yellow-200 px-6 py-4 w-full max-w-2xl">
+            <p className="text-sm text-yellow-900">
+              Reference number not available. Please check your email/SMS or
+              try refreshing status.
+            </p>
+          </div>
+        )}
+
+        <div className="mt-4 grid gap-3 w-full max-w-2xl">
+          <StatusRow label="Application Status" value={data?.status} />
+          <StatusRow label="Payment Status" value={data?.payment_status} />
+          <StatusRow label="Membership ID" value={data?.membership_id} />
+        </div>
+
+        <div className="mt-8 flex flex-col sm:flex-row flex-wrap gap-3 justify-center w-full max-w-2xl">
+          {onRefresh && (
+            <button
+              type="button"
+              onClick={onRefresh}
+              className="w-full sm:w-auto px-6 py-3 font-semibold rounded-full border-2 border-dashed border-black transition hover:opacity-90"
+            >
+              Refresh Status
+            </button>
+          )}
+          {data?.download_url && (
+            <a
+              href={data.download_url}
+              target="_blank"
+              rel="noreferrer"
+              className="w-full sm:w-auto px-6 py-3 font-semibold rounded-full border-2 border-dashed border-black transition hover:opacity-90 text-center"
+            >
+              Download
+            </a>
+          )}
+          <button
+            type="button"
+            onClick={onNewApplication}
+            className="w-full sm:w-auto px-6 py-3 font-semibold rounded-full border-2 border-dashed border-black transition hover:opacity-90"
+          >
+            New Application
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatusRow({ label, value }: { label: string; value?: string }) {
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 rounded-lg border border-gray-200 bg-white px-5 py-4">
+      <span className="text-sm font-semibold text-gray-700">{label}</span>
+      <span className="text-sm text-gray-900 sm:text-right break-words">
+        {value || "—"}
+      </span>
+    </div>
+  );
+}
 
 function Label({ children }: { children: string }) {
   return (
@@ -1133,7 +1627,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           {...props}
-          className={`w-full px-4 py-3 text-gray-900 bg-white border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors placeholder-gray-400 ${
+          className={`w-full px-4 py-3 text-gray-900 bg-white border  focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors placeholder-gray-400 ${
             error ? "border-red-500" : "border-gray-300"
           }`}
         />
@@ -1157,7 +1651,7 @@ function Textarea({ label, error, ...props }: TextareaProps) {
       <Label>{label}</Label>
       <textarea
         {...props}
-        className={`w-full px-4 py-3 text-gray-900 bg-white border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors resize-none placeholder-gray-400 ${
+        className={`w-full px-4 py-3 text-gray-900 bg-white border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors resize-none placeholder-gray-400 ${
           error ? "border-red-500" : "border-gray-300"
         }`}
       />
@@ -1179,7 +1673,7 @@ function SelectInput({ label, options, ...props }: SelectInputProps) {
       <div className="relative">
         <select
           {...props}
-          className="w-full pl-4 pr-10 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none transition-colors"
+          className="w-full pl-4 pr-10 py-3 bg-white border border-gray-300 r focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none transition-colors"
         >
           <option value="">
             Select {label.toLowerCase().replace("*", "").trim()}
@@ -1209,7 +1703,17 @@ function SelectInput({ label, options, ...props }: SelectInputProps) {
   );
 }
 
-function Radio({ name, label, checked, onChange }: any) {
+function Radio({
+  name,
+  label,
+  checked,
+  onChange,
+}: {
+  name: string;
+  label: string;
+  checked: boolean;
+  onChange: () => void;
+}) {
   return (
     <label className="flex items-center gap-3 cursor-pointer">
       <div className="relative">
@@ -1217,7 +1721,7 @@ function Radio({ name, label, checked, onChange }: any) {
           type="radio"
           name={name}
           checked={checked}
-          onChange={onChange}
+          onChange={() => onChange()}
           className="sr-only peer"
         />
         <div className="w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center peer-checked:border-blue-600 transition-colors">
@@ -1231,14 +1735,22 @@ function Radio({ name, label, checked, onChange }: any) {
   );
 }
 
-function Checkbox({ label, checked, onChange }: any) {
+function Checkbox({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: () => void;
+}) {
   return (
     <label className="flex items-center gap-3 cursor-pointer">
       <div className="relative">
         <input
           type="checkbox"
           checked={checked}
-          onChange={onChange}
+          onChange={() => onChange()}
           className="sr-only peer"
         />
         <div className="w-5 h-5 border-2 border-gray-300 rounded flex items-center justify-center peer-checked:bg-blue-600 peer-checked:border-blue-600 transition-colors">
@@ -1277,7 +1789,7 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
     return (
       <div>
         <div
-          className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-300 ${
+          className={`border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-colors duration-300 ${
             error
               ? "border-red-500 bg-red-50"
               : fileName
@@ -1288,7 +1800,7 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
           <div className="mb-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className={`h-12 w-12 mx-auto ${error ? "text-red-400" : fileName ? "text-green-500" : "text-gray-400"}`}
+              className={`h-10 w-10 sm:h-12 sm:w-12 mx-auto ${error ? "text-red-400" : fileName ? "text-green-500" : "text-gray-400"}`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

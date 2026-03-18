@@ -1,79 +1,147 @@
-import Link from "next/link";
-
+﻿import Link from "next/link";
 
 export default function Footer() {
   return (
-  <footer id="contact" className="relative w-full bg-black xl:py-14 py-10 xl:px-[110px] md:px-20 px-5">
-        <div className="flex flex-col gap-8 justify-between items-center">
-            <div className="flex items-center gap-1">
-                <div className="font-bold text-white text-2xl tracking-[0] leading-[44px] whitespace-nowrap">
-                    <img src="/iaccslogo.png" alt="Iaccslogo" width={100} height={100} />
-                </div>
-            </div>
+    <footer id="contact" className="w-full">
 
-            <nav className="w-full flex flex-wrap justify-between items-center gap-4">
-                <div className="flex flex-wrap gap-6">
-                    <Link href="/" className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        Home
-                    </Link>
-                    <Link href="/about-us" className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        About us
-                    </Link>
-                    {/* <Link href="/contact-us" className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        Contact
-                    </Link> */}
-                    <Link href="/privacy-policy" className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        Privacy Policy
-                    </Link>
-                    <Link href="/terms-conditions" className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        Terms & Conditions
-                    </Link>
-                    <Link href="/refund-policy" className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        Refund Policy
-                    </Link>
-                </div>
+  {/* Top strip */}
+  <div className="bg-[#1a18a8] text-white px-4 sm:px-6 md:px-12 lg:px-[110px] py-8 md:py-10">
 
-             
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 text-[15px]">
 
-                <div className="flex flex-wrap items-center gap-6">
-                    <div className="font-bold text-base leading-[25.6px] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        Connect
-                    </div>
-<div className="flex flex-wrap justify-center gap-6">
-                    <a href="https://www.facebook.com/share/1Eujhyvcd1/"  target="_blank"
-  rel="noopener noreferrer" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        Facebook
-                    </a>
-                    <a href="https://www.instagram.com/accs_india?igsh=cHh0d2ZsN3U1MWhr"  target="_blank"
-  rel="noopener noreferrer" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        Instagram
-                    </a>
-                    
-                    <a href="https://www.linkedin.com/company/iaccs-india/"  target="_blank"
-  rel="noopener noreferrer" className="font-normal text-sm leading-[22.4px] opacity-[0.78] text-white tracking-[0] whitespace-nowrap hover:opacity-100 transition-opacity">
-                        Linkdin
-                    </a>
-                    </div>
-                </div>
-            </nav>
+      {/* Quick Links */}
+      <div>
+        <h3 className="text-xl md:text-2xl font-semibold mb-4">Quick Links</h3>
 
-            {/* <div className="flex flex-col gap-8 max-w-[546px] w-full">
-                <h2 className="font-bold text-white text-[40px] tracking-[0] leading-[56px]">
-                    Subscribe to get latest updates
-                </h2>
+        <ul className="space-y-2 md:space-y-3 leading-relaxed">
+          <li>
+            <Link href="/about-us" className="hover:underline">
+              <span className="mr-2">&gt;</span> About us
+            </Link>
+          </li>
 
-                <div className="flex gap-2">
-                    <input
-                        type="email"
-                        placeholder="Your email"
-                        className="flex-1 h-16 bg-transparent border border-[#ebf0f94c] text-white placeholder:text-[#ebf0f94c] placeholder:opacity-80 font-normal text-base rounded px-4"
-                    />
-                    <button className="h-16 px-8 bg-white text-primary-text font-medium text-base rounded backdrop-blur-2xl backdrop-brightness-[100%] hover:opacity-90">
-                        Subscribe
-                    </button>
-                </div>
-            </div> */}
+          <li>
+            <Link href="/refund-policy" className="hover:underline">
+              <span className="mr-2">&gt;</span> Refund Policy
+            </Link>
+          </li>
+
+          <li>
+            <Link href="/privacy-policy" className="hover:underline">
+              <span className="mr-2">&gt;</span> Privacy Policy
+            </Link>
+          </li>
+
+          <li>
+            <Link href="/terms-conditions" className="hover:underline">
+              <span className="mr-2">&gt;</span> Terms & Conditions
+            </Link>
+          </li>
+        </ul>
+      </div>
+
+      {/* Social Links */}
+      <div className="text-left sm:text-center">
+
+        <h3 className="text-xl md:text-2xl font-semibold mb-4">Social Links</h3>
+
+        <div className="flex items-center sm:justify-center gap-5 md:gap-6 mb-4">
+
+          <a
+            href="https://www.instagram.com/accs_india?igsh=cHh0d2ZsN3U1MWhr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:opacity-90"
+          >
+            <img src="/assets/images/img86.png" alt="Instagram" width={22} />
+          </a>
+
+          <a
+            href="https://www.facebook.com/share/1Eujhyvcd1/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:opacity-90"
+          >
+            <img src="/assets/images/img85.png" alt="Facebook" width={22} />
+          </a>
+
+          <a
+            href="https://www.linkedin.com/company/iaccs-india/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:opacity-90"
+          >
+            <img src="/assets/images/img87.png" alt="LinkedIn" width={22} />
+          </a>
+
+          <a
+            href="https://x.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:opacity-90"
+          >
+            <img src="/assets/images/img88.jpg" alt="X" width={20} />
+          </a>
+
         </div>
-    </footer>
+
+        <p className="text-xs md:text-sm opacity-90">
+          Last Updated on - XX/XX/XXXX
+        </p>
+
+      </div>
+
+      {/* Our Office */}
+      <div>
+
+        <h3 className="text-xl md:text-2xl font-semibold mb-4">
+          Our Office
+        </h3>
+
+        <div className="flex items-start gap-3">
+
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="mt-1 flex-shrink-0"
+          >
+            <path
+              d="M12 2C7.6 2 4 5.6 4 10c0 5.3 6.8 11.5 7.1 11.8.5.4 1.3.4 1.8 0C13.2 21.5 20 15.3 20 10c0-4.4-3.6-8-8-8Zm0 11.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"
+              fill="#fff"
+            />
+          </svg>
+
+          <address className="not-italic text-sm md:text-base leading-relaxed">
+            168, Mathkal, Nazrul Sarani, Dumdum<br />
+            Cantonment, Kolkata, 700065
+          </address>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  {/* Bottom strip */}
+  <div className="bg-[#226022] text-white px-4 sm:px-6 md:px-12 lg:px-[110px] py-4 text-xs md:text-sm text-center md:text-left">
+
+    <p className="mb-1">
+      Registered as an AOP for regulatory purposes
+    </p>
+
+    <p>
+      2025 ©{" "}
+      <Link href="/" className="underline">
+        The Association For Critical Care Sciences (The ACCS)
+      </Link>
+      , All Right Reserved.
+    </p>
+
+  </div>
+
+</footer>
   );
 }

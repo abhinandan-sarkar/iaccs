@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 
 export default function Contact() {
@@ -216,29 +216,18 @@ export default function Contact() {
         </div>
       )}
 
-      <header className="relative w-full flex flex-col bg-[url(/assets/images/banner-img.png)] bg-cover bg-center py-32 mt-20">
-        <div className="absolute inset-0 bg-black opacity-50"></div>
-        <div className="container mx-auto xl:px-[110px] md:px-20 px-5 relative z-[1]">
-          <div className="w-full max-w-[642px] flex flex-col gap-4">
-            <h1 className="w-full max-w-[640px] font-bold text-white xl:text-[64px] md:text-4xl text-3xl tracking-[0] xl:leading-[76.8px]">
-              Contact Us
-            </h1>
-            <p className="text-lg text-white">
-              Have any questions or want to work with us? Feel free to reach out anytime.
-            </p>
-          </div>
-        </div>
-      </header>
 
-      <section className="w-full bg-white flex flex-col gap-16 py-16 xl:px-[110px] md:px-20 px-5">
+      <section className="w-full bg-white flex flex-col gap-16 py-16 xl:px-[110px] md:px-20 px-5 mt-[40px]">
         <div className="w-full gap-[82px]">
+          <h1 className="w-full font-bold text-gray-900 xl:text-[48px] md:text-4xl sm:text-4xl text-3xl !leading-tight mb-[20px]" style={{ fontFamily: "Georgia, serif" }}>Contact Us</h1>
+
           <div className="flex flex-wrap -mx-4 gap-y-10">
             <div className="lg:w-1/2 w-full px-4">
               <div className="space-y-8">
                 <div className="">
-                  <h3 className="text-2xl font-semibold mb-4 text-gray-800">Head Office Address</h3>
+                  <h3 className="text-2xl font-semibold mb-4 text-gray-800" style={{color:'#1a4075'}}>Head Office Address</h3>
 
-                  <div className="space-y-4 text-gray-700">
+                  <div className="space-y-4 text-gray-700 text-base md:text-lg">
                     <p>
                       <strong>Address:</strong> 168, Mathkal, Nazrul Sarani, Dumdum Cantonment,
                       Kolkata, 700065
@@ -248,6 +237,7 @@ export default function Contact() {
                       <a
                         href="mailto:admin@iaccs.org.in"
                         className="text-blue-600 hover:underline ml-1"
+                        style={{color:'#1a4075'}}
                       >
                         admin@iaccs.org.in
                       </a>
@@ -259,7 +249,7 @@ export default function Contact() {
 
             <div className="lg:w-1/2 w-full px-4">
               <div className="">
-                <h3 className="text-2xl font-semibold mb-6 text-gray-800">Send Us a Message</h3>
+                <h3 className="text-2xl font-semibold mb-6 text-gray-800" style={{color:'#1a4075'}}>Send Us a Message</h3>
 
                 <form onSubmit={handleSubmit}>
                   <div className="mb-4">
@@ -271,7 +261,7 @@ export default function Contact() {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className={`w-full p-3 bg-white text-gray-900 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 ${
+                      className={`w-full p-3 bg-white text-gray-900 border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 ${
                         errors.name ? "border-red-500" : "border-gray-300"
                       }`}
                       placeholder="Enter your name"
@@ -288,7 +278,7 @@ export default function Contact() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className={`w-full p-3 bg-white text-gray-900 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 ${
+                      className={`w-full p-3 bg-white text-gray-900  border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 ${
                         errors.email ? "border-red-500" : "border-gray-300"
                       }`}
                       placeholder="Enter your email"
@@ -305,7 +295,7 @@ export default function Contact() {
                       name="subject"
                       value={formData.subject}
                       onChange={handleChange}
-                      className={`w-full p-3 bg-white text-gray-900 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 ${
+                      className={`w-full p-3 bg-white text-gray-900 border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 ${
                         errors.subject ? "border-red-500" : "border-gray-300"
                       }`}
                       placeholder="Enter subject"
@@ -322,7 +312,7 @@ export default function Contact() {
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
-                      className={`w-full p-3 bg-white text-gray-900 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 resize-none ${
+                      className={`w-full p-3 bg-white text-gray-900 border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 resize-none ${
                         errors.message ? "border-red-500" : "border-gray-300"
                       }`}
                       placeholder="Write your message"
@@ -333,10 +323,10 @@ export default function Contact() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`px-8 py-4 bg-blue-600 text-white font-medium text-base rounded-lg transition-colors ${
+                    className={`w-full sm:w-auto px-8 sm:px-16 py-4 font-semibold rounded-full border-2 border-dashed border-black transition ${
                       isSubmitting
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:bg-blue-700"
+                        ? "opacity-60 cursor-not-allowed"
+                        : "hover:opacity-90"
                     }`}
                   >
                     {isSubmitting ? "Sending..." : "Send Message"}
@@ -348,22 +338,8 @@ export default function Contact() {
         </div>
       </section>
 
-      <style jsx>{`
-        @keyframes slide-in {
-          from {
-            transform: translateX(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-
-        .animate-slide-in {
-          animation: slide-in 0.3s ease-out;
-        }
-      `}</style>
     </div>
   );
 }
+
+

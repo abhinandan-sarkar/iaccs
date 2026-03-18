@@ -1,239 +1,434 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 export default function Home() {
   return (
     <div className="bg-white">
-    {/* <!-- Header Section --> */}
-    <header className="relative w-full flex flex-col bg-[url(/assets/images/banner-img.png)] bg-cover bg-center py-32 mt-20">
-      <div className="absolute inset-0 bg-black opacity-50"></div>
-        <div className="container mx-auto xl:px-[110px] md:px-20 px-5 relative z-[1]">
-            <div className="w-full max-w-[642px] flex flex-col gap-8">
-                <div className="text-white">
-                    <h1 className="w-full max-w-[640px] font-bold text-white xl:text-[64px] md:text-4xl text-3xl tracking-[0] xl:leading-[76.8px]">Welcome to ACCS The Association for Critical Care Sciences</h1>
-                    <p className="mt-2 text-white/80">RECOGNITION . STANDARDS . EXCELLENCE .</p>
-                </div>
-                <p className="text-lg text-white/90">ACCS is dedicated to advancing clinical excellence, promoting education, and strengthening the future workforce in Critical Care Science. Together, we work for recognition, standardization, and growth of our profession</p>
+      {/* <!-- Header Section --> */}
+      <header className="relative w-full flex flex-col bg-[url(/assets/images/img189.jpg)] bg-cover bg-center py-20 md:py-24 lg:py-32 mt-20">
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/50"></div>
 
-                <div className="flex gap-6">
-                    <Link href="/membership" className="inline-block px-8 py-4 bg-white text-gray-900 font-medium text-base rounded hover:bg-gray-100 transition-colors">
-                        Volunteer Today
-                    </Link>
-                </div>
+        <div className="mx-auto px-4 sm:px-6 md:px-12 lg:px-[110px] relative z-[1]">
+          <div className="w-full flex flex-col gap-6 md:gap-8 max-w-[900px]">
+            {/* Heading */}
+            <div className="text-white">
+              <h1
+                className="font-bold text-white text-2xl sm:text-3xl md:text-4xl lg:text-[45px] leading-snug lg:leading-[64px]"
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  textShadow: "1px 4px 1px rgb(0,0,0)",
+                }}
+              >
+                Welcome to ACCS The Association for Critical Care Sciences
+              </h1>
+
+              <p
+                className="mt-4 text-white/80 text-sm sm:text-base md:text-lg"
+                style={{
+                  fontFamily: '"Times New Roman", Times, serif',
+                }}
+              >
+                RECOGNITION . STANDARDS . EXCELLENCE .
+              </p>
             </div>
+
+            {/* Description */}
+            <p
+              className="text-sm sm:text-base md:text-lg text-white/90 leading-relaxed"
+              style={{
+                fontFamily: '"Times New Roman", Times, serif',
+              }}
+            >
+              ACCS is dedicated to advancing clinical excellence, promoting
+              education, and strengthening the future workforce in Critical Care
+              Science. Together, we work for recognition, standardization, and
+              growth of our profession.
+            </p>
+
+            {/* Button */}
+            <div className="flex flex-wrap gap-4">
+              <Link
+                href="/membership"
+                className="inline-block px-6 md:px-8 py-2 md:py-3 text-gray-900
+          rounded-full border-2 border-dashed border-black
+          hover:opacity-90 transition text-sm md:text-base"
+                style={{
+                  backgroundColor: "#38b6ff",
+                  fontFamily: '"Times New Roman", Times, serif',
+                  fontWeight: "bold",
+                }}
+              >
+                JOIN US TODAY
+              </Link>
+            </div>
+          </div>
         </div>
-    </header>
+      </header>
 
-    {/* <!-- About Us Section --> */}
-    <section id="about" className="w-full bg-white flex flex-col gap-16 py-16 xl:px-[110px] md:px-20 px-5">
-        <div className="w-full flex flex-wrap gap-12 lg:gap-[82px]">
-            <div className="flex-1 min-w-[300px] flex flex-col gap-6 relative">
-                <h2 className="font-bold text-gray-900 xl:text-2xl md:text-xl text-lg tracking-[0] xl:leading-[120%]">MISSION & VISION</h2>
+      {/* <!-- About Us Section --> */}
+      <section
+        id="about"
+        className="w-full bg-white flex flex-col gap-10 md:gap-14 py-12 md:py-16 px-5 md:px-12 lg:px-20 xl:px-[110px]"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Vision Card */}
+          <div className="border-2 border-dashed border-gray-500 rounded-2xl bg-white overflow-hidden">
+            <img
+              src="/assets/images/img222.jpg"
+              alt="Vision"
+              className="w-full h-48 sm:h-56 md:h-64 object-cover"
+            />
 
-                <p className="text-gray-600 text-base tracking-[0] leading-[160%]">The Association for Critical Care Sciences (ACCS) is a community-led initiative formed to represent, support, and advance the field of Critical Care Science in India. We work towards unifying students, graduates, educators, and professionals to strengthen recognition, create academic opportunities, and uphold high standards in clinical practice.</p>
+            <div className="p-5 md:p-6 text-center">
+              <h2 className="inline-block px-5 md:px-6 py-2 text-xl md:text-2xl lg:text-3xl font-bold border-2 border-dashed border-black rounded-full font-serif">
+                VISION
+              </h2>
 
-                <h3 className="font-bold text-gray-900">MISSION & VISION</h3>
-
-                <p className="text-gray-700">To empower Critical Care professionals through education, advocacy, collaboration, and skill development, ensuring excellence in patient care across Intensive Care settings.</p>
-
-                <p className="text-gray-700">A future where Critical Care Science is nationally recognized, standardized, and valued as an essential healthcare specialty supported by strong academic pathways, ethical practice, and professional dignity.</p>
-
-                <div>
-                    <Link href="/about-us" className="inline-block bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-medium text-base px-8 py-4 rounded transition-colors">
-                        Learn more
-                    </Link>
-                </div>
+              <p className="mt-4 text-gray-700 leading-relaxed text-sm md:text-base text-justify md:text-justify">
+                The Association for Critical Care Sciences (ACCS) is a
+                community-led initiative formed to represent, support, and
+                advance the field of Critical Care Technology/Science in India.
+                We work towards unifying students, graduates, educators, and
+                professionals to strengthen recognition, create academic
+                opportunities, and uphold high standards in clinical practice.
+              </p>
             </div>
+          </div>
 
-            <div className="md:w-[480px] md:flex-shrink-0">
-                <img className="w-full h-auto rounded-lg" alt="About us" src="/assets/images/about-us.png" />
+          {/* Mission Card */}
+          <div className="border-2 border-dashed border-gray-500 rounded-2xl bg-white overflow-hidden">
+            <img
+              src="/assets/images/img227.jpg"
+              alt="Mission"
+              className="w-full h-48 sm:h-56 md:h-64 object-cover"
+            />
+
+            <div className="p-5 md:p-6 text-center">
+              <h2 className="inline-block px-5 md:px-6 py-2 text-xl md:text-2xl lg:text-3xl font-bold border-2 border-dashed border-black rounded-full font-serif">
+                MISSION
+              </h2>
+
+              <p className="mt-4 text-gray-700 leading-relaxed text-sm md:text-base text-justify">
+                To empower Critical Care Technology professionals through
+                education, advocacy, collaboration, and skill development,
+                ensuring excellence in patient care across Intensive Care
+                settings. A future where Critical Care Technology/Science is
+                nationally recognized and valued as an essential healthcare
+                specialty supported by strong academic pathways, ethical
+                practice, and professional dignity.
+              </p>
             </div>
+          </div>
         </div>
-    </section>
+      </section>
+      <section>
+        <div className="relative group px-4 sm:px-6 lg:px-[110px]">
+          {/* Title */}
+          <h2 className="text-center text-2xl md:text-3xl lg:text-4xl font-semibold text-gray-800 mb-10">
+            Our Governing Members
+          </h2>
 
-    <section id="services" className="relative w-full bg-yellow-400 xl:py-[120px] md:py-20 py-10">
-        <div className="max-w-[1500px] mx-auto xl:px-[206px] md:px-10 px-5">
-            <div className="flex flex-wrap md:flex-nowrap gap-10 justify-center">
-                <div className="font-bold text-gray-900 xl:text-[48px] md:text-3xl text-2xl tracking-[0] xl:leading-[120%]">200+ Student Members</div>
-                <div className="font-bold text-gray-900 xl:text-[48px] md:text-3xl text-2xl tracking-[0] xl:leading-[120%]">200+ Professional Members</div>
+          {/* Slider Container */}
+          <div className="relative w-full mx-auto">
+            {/* Left Arrow */}
+            <button className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 bg-black/40 text-white p-4 opacity-0 group-hover:opacity-100 transition">
+              ◀
+            </button>
+
+            {/* Members */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+              {/* Card 1 */}
+              <div className="bg-white rounded-xl shadow p-6 text-center w-full max-w-[260px]">
+                <img
+                  src="/assets/images/bapan-sarkar.jpg"
+                  alt="member"
+                  className="w-28 h-28 md:w-32 md:h-32 object-cover rounded-lg mx-auto"
+                />
+                <h3 className="mt-4 font-semibold text-gray-800">
+                  BAPAN SARKAR
+                </h3>
+                <p className="text-sm text-gray-600">President</p>
+                <p className="text-sm text-gray-500">M.sc CCST</p>
+              </div>
+
+              {/* Card 2 */}
+              <div className="bg-white rounded-xl shadow p-6 text-center w-full max-w-[260px]">
+                <img
+                  src="/assets/images/atri-banerjee.jpg"
+                  alt="member"
+                  className="w-28 h-28 md:w-32 md:h-32 object-cover rounded-lg mx-auto"
+                />
+                <h3 className="mt-4 font-semibold text-gray-800">
+                  ATRI BANERJEE
+                </h3>
+                <p className="text-sm text-gray-600">General Secretary</p>
+                <p className="text-sm text-gray-500">B.sc CCT</p>
+              </div>
+
+              {/* Card 3 */}
+              <div className="bg-white rounded-xl shadow p-6 text-center w-full max-w-[260px]">
+                <img
+                  src="/assets/images/trina-ghorai.jpg"
+                  alt="member"
+                  className="w-28 h-28 md:w-32 md:h-32 object-cover rounded-lg mx-auto"
+                />
+                <h3 className="mt-4 font-semibold text-gray-800">
+                  TRINA GHORAI
+                </h3>
+                <p className="text-sm text-gray-600">Vice President</p>
+                <p className="text-sm text-gray-500">M.sc CCST</p>
+              </div>
             </div>
+
+            {/* Right Arrow */}
+            <button className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 bg-black/40 text-white p-4 opacity-0 group-hover:opacity-100 transition">
+              ▶
+            </button>
+          </div>
         </div>
-    </section>
 
-    {/* <!-- Projects Section --> */}
-    <section className="relative w-full bg-white xl:px-[110px] md:px-20 px-5 py-24">
-        <div className="max-w-[1280px] mx-auto">
-            <div className="flex flex-wrap items-start gap-8 xl:mb-16 md:mb-10 mb-5">
-                <div className="flex items-center gap-6">
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="font-bold text-gray-900 text-base tracking-[2.00px] leading-[normal] whitespace-nowrap uppercase">
-                            Building the Future
-                        </div>
-                    </div>
-                    <div className="w-[72px] h-0.5 bg-gray-400"></div>
-                </div>
-
-                <h2 className="max-w-[640px] font-bold text-gray-900 xl:text-[48px] md:text-3xl text-2xl !leading-tight">Building the Future of Critical Care Professionals in India</h2>
-                <p className="md:pl-80 text-gray-600">Empowering students, trainees, and professionals through organized efforts, education, and advocacy.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="relative w-full h-[421px] overflow-hidden rounded-[20px]">
-                    <img className="absolute inset-0 w-full h-full object-cover" alt="Mission smile 1k" src="/assets/images/child-care.png" />
-                    <div className="absolute inset-0 bg-black rounded-[20px] opacity-60"></div>
-                    <div className="absolute top-12 left-8 right-8 flex flex-col">
-                        <h3 className="font-bold text-white text-2xl md:text-[28px] tracking-[0] leading-[140%]">
-                            Advocacy for Recognition
-                        </h3>
-                        <div className="mt-4 text-white/90 text-base tracking-[0] leading-[160%]">
-                            Working toward the official recognition of Critical Care Science under national healthcare frameworks. We collaborate with policymakers, institutions, and stakeholders to secure professional identity and rights
-                        </div>
-                        <Link href="/about-us" className="inline-block w-fit mt-8 px-6 py-3 bg-white text-gray-900 font-medium text-base rounded hover:bg-gray-100 transition-colors">
-                            Learn more
-                        </Link>
-                    </div>
-                </div>
-
-                <div className="relative w-full h-[421px] overflow-hidden rounded-[20px]">
-                    <img className="absolute inset-0 w-full h-full object-cover" alt="Weekly excursions" src="/assets/images/about-us.png" />
-                    <div className="absolute inset-0 bg-black rounded-[20px] opacity-60"></div>
-                    <div className="absolute top-12 left-8 right-8 flex flex-col">
-                        <div className="font-bold text-white text-2xl md:text-[28px] tracking-[0] leading-[140%]">
-                            Training & Skill Development
-                        </div>
-                        <div className="mt-4 text-white/90 text-base tracking-[0] leading-[160%]">
-                            Helping students and professionals enhance their knowledge and hands-on ICU skills through workshops and training programs.
-                        </div>
-                        <Link href="/about-us" className="inline-block w-fit mt-8 px-6 py-3 bg-white text-gray-900 font-medium text-base rounded hover:bg-gray-100 transition-colors">
-                            Learn more
-                        </Link>
-                    </div>
-                </div>
-
-                <div className="relative w-full h-[421px] overflow-hidden rounded-[20px]">
-                    <img className="absolute inset-0 w-full h-full object-cover" alt="Monthly public awareness" src="/assets/images/medical-camp.png" />
-                    <div className="absolute inset-0 bg-black rounded-[20px] opacity-60"></div>
-                    <div className="absolute top-12 left-8 right-8 flex flex-col">
-                        <div className="font-bold text-white text-2xl md:text-[28px] tracking-[0] leading-[140%]">
-                            Academic Support & Study Resources
-                        </div>
-                        <div className="mt-4 text-white/90 text-base tracking-[0] leading-[160%]">
-                            Providing structured learning materials, mentorship, and access to essential educational resources for students and practicing professionals in critical care domains
-                        </div>
-                        <Link href="/about-us" className="inline-block w-fit mt-8 px-6 py-3 bg-white text-gray-900 font-medium text-base rounded hover:bg-gray-100 transition-colors">
-                            Learn more
-                        </Link>
-                    </div>
-                </div>
-            </div>
+        {/* Button */}
+        <div className="text-center mt-10 px-4">
+          <button className="px-8 py-3 bg-[#38b6ff] border-2 border-dashed border-black rounded-full font-semibold">
+            View Full list
+          </button>
         </div>
-    </section>
 
-    {/* <!-- Statistics Section --> */}
-    <section className="relative w-full bg-gray-900 xl:py-[85px] py-16 xl:px-[110px] md:px-20 px-5">
-        <div className="max-w-[1500px] mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                <div className="flex flex-col gap-8 max-w-[633px]">
-                    <div className="flex flex-col gap-6">
-                        <h2 className="font-bold text-white xl:text-[48px] md:text-3xl text-2xl tracking-[0] !leading-tight">
-                            Join us to make it possible to create a better place for Critical Care Professionals.
-                        </h2>
-
-                        <Link href="/membership" className="inline-block w-fit px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-medium text-base rounded transition-colors">
-                            Join Us
-                        </Link>
-                    </div>                    
-                </div>
-
-                <div className="w-full flex justify-center lg:justify-end">
-                    <div className="relative max-w-[480px]">
-                        <img className="w-full h-auto rounded-lg" alt="About us" src="/assets/images/about-us.png" />
-                    </div>
-                </div>
-            </div>
+        {/* Notice */}
+        <div className="w-full px-4 sm:px-6 lg:px-[110px] mb-4">
+          <div className="mx-auto mt-8 border-2 border-dashed border-gray-500 rounded-xl p-4 text-red-500 text-center text-sm md:text-base">
+            *Due to some limitations, we are currently unable to publish the
+            members list. However we assure you that it will be made available
+            at a later date.
+          </div>
         </div>
-    </section>
-
-    {/* <!-- Call to Action Section --> */}
-    {/* <section className="relative py-24 w-full flex items-center justify-center bg-[url(/assets/images/Donor-Focused-Version.png)] bg-cover bg-center">
-        <div className="inset-0 bg-opacity-50 bg-black absolute"></div>
-        <div className="flex flex-col items-center gap-8 px-4 max-w-5xl relative">
-            <h2 className="font-bold text-white xl:text-[48px] md:text-3xl text-2xl !leading-none">
-                Your generosity makes it possible for us to build a healing space that delivers specialized medical care and support to children with special needs.
-            </h2>
-
-            <div className="flex gap-8">
-                <button className="h-auto px-8 py-4 bg-yellow-500 hover:opacity-90 text-[#000000] font-medium text-base rounded backdrop-blur-2xl backdrop-brightness-[100%]">
-                    Join as a volunteer
-                </button>
-
-                <button className="h-auto px-8 py-4 bg-white hover:opacity-90 text-primary-text font-medium text-base rounded backdrop-blur-2xl backdrop-brightness-[100%]">
-                    Donate
-                </button>
-            </div>
-        </div>
-    </section> */}
-
-    {/* <!-- Events Section --> */}
-    <section id="media" className="w-full bg-white xl:px-[110px] md:px-20 px-5 py-16">
-        <div className="max-w-[1280px] mx-auto">
-            <div className="flex items-center gap-4 mb-10">
-                <h2 className="font-bold text-gray-900 xl:text-[48px] md:text-3xl text-2xl !leading-none">
-                    Our Events
-                </h2>
-                <div className="flex-1 h-px bg-gray-300"></div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-yellow-400 rounded-[20px] p-8 md:p-10">
-                    <div className="flex items-start gap-5">
-                        <div className="flex flex-col">
-                            <div className="font-bold text-gray-900 text-4xl md:text-5xl tracking-[0] leading-tight">
-                                13
-                            </div>
-                            <div className="font-medium text-gray-900 text-base tracking-[2.00px] leading-[normal]">
-                                APR
-                            </div>
-                        </div>
-
-                        <div className="flex-1">
-                            <div className="text-sm font-medium text-gray-700 uppercase tracking-wider mb-2">
-                                NEXT EVENT
-                            </div>
-                            <div className="font-bold text-gray-900 text-xl md:text-[28px] tracking-[0] leading-[140%]">
-                                Coming Soon...
-                            </div>
-                        </div>
-
-                        <img className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0" alt="Arrow button" src="/assets/images/arrow-button.png" />
-                    </div>
+      </section>
+      <section>
+        <div className="px-4 sm:px-6 lg:px-[110px] py-10">
+          <div className="border-2 border-black rounded-3xl overflow-hidden bg-gray-100">
+            {/* Three Column Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              {/* Announcements */}
+              <div className="p-6 md:p-8 border-b md:border-b lg:border-r border-black">
+                <div className="bg-green-500 text-white flex items-center gap-3 px-6 py-3 rounded-full mb-6 w-full justify-center">
+                  <img src="assets/images/img24.png" alt="" width={28} />
+                  <h3 className="text-lg md:text-xl font-semibold">
+                    Announcements
+                  </h3>
                 </div>
 
-                <div className="bg-yellow-400 rounded-[20px] p-8 md:p-10">
-                    <div className="flex items-start gap-5">
-                        <div className="flex flex-col">
-                            <div className="font-bold text-gray-900 text-4xl md:text-5xl tracking-[0] leading-tight">
-                                25
-                            </div>
-                            <div className="font-medium text-gray-900 text-base tracking-[2.00px] leading-[normal]">
-                                APR
-                            </div>
-                        </div>
+                {/* <ul className="space-y-3 text-base md:text-lg">
+                  <li>
+                    &gt; ABC ..............
+                    <span className="text-pink-500 text-sm ml-2">NEW</span>
+                  </li>
+                  <li>
+                    &gt; Example ..............
+                    <span className="text-pink-500 text-sm ml-2">NEW</span>
+                  </li>
+                  <li>&gt; Example ..............</li>
+                  <li>&gt; Example ..............</li>
+                </ul> */}
+                <span className="block text-center text-gray-700">No Records found</span>
 
-                        <div className="flex-1">
-                            <div className="text-sm font-medium text-gray-700 uppercase tracking-wider mb-2">
-                                NEXT EVENT
-                            </div>
-                            <div className="font-bold text-gray-900 text-xl md:text-[28px] tracking-[0] leading-[140%]">
-                                Coming Soon...
-                            </div>
-                        </div>
+              </div>
 
-                        <img className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0" alt="Arrow button" src="/assets/images/arrow-button.png" />
-                    </div>
+              {/* Notices */}
+              <div className="p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-black">
+                <div className="bg-green-500 text-white flex items-center gap-3 px-6 py-3 rounded-full mb-6 w-full justify-center">
+                  <img src="assets/images/img57.png" alt="" width={22.4} />
+                  <h3 className="text-lg md:text-xl font-semibold">Notices</h3>
                 </div>
+
+                {/* <ul className="space-y-3 text-base md:text-lg">
+                  <li>
+                    &gt; Example ..............
+                    <span className="text-pink-500 text-sm ml-2">NEW</span>
+                  </li>
+                  <li>&gt; Example ..............</li>
+                  <li>&gt; Example ..............</li>
+                  <li>&gt; Example ..............</li>
+                </ul> */}
+                <span className="block text-center text-gray-700">No Records found</span>
+              </div>
+
+              {/* Reports */}
+              <div className="p-6 md:p-8">
+                <div className="bg-green-500 text-white flex items-center gap-3 px-6 py-3 rounded-full mb-6 w-full justify-center">
+                  <img src="assets/images/reports.png" alt="" width={30} />
+                  <h3 className="text-lg md:text-xl font-semibold">Reports</h3>
+                </div>
+
+                {/* <ul className="space-y-3 text-base md:text-lg">
+                  <li>&gt; Annual Report 2024</li>
+                  <li>&gt; Financial Report</li>
+                  <li>&gt; Membership Report</li>
+                  <li>&gt; Research Report</li>
+                </ul> */}
+                <span className="block text-center text-gray-700">No Records found</span>
+              </div>
             </div>
+
+            {/* Bottom Note */}
+            <div className="border-t border-black p-4 text-center text-red-500 text-sm md:text-lg">
+              *Note:- If you can’t find any announcement, notices or reports
+              visit the official sections.
+            </div>
+          </div>
         </div>
-    </section>
+      </section>
+
+      <section>
+        <div className="w-full px-4 sm:px-6 md:px-10 lg:px-[110px]">
+          {/* Title */}
+          <h2 className="text-center text-xl md:text-2xl font-semibold mb-4">
+            Critical Care Technology Professionals working in hospital settings
+          </h2>
+
+          {/* Image Container */}
+          <div className="relative group">
+            {/* Left Arrow */}
+            <button className="absolute left-0 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 md:p-4 opacity-0 group-hover:opacity-100 transition">
+              ◀
+            </button>
+
+            {/* Images */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full overflow-hidden gap-2 md:gap-3 lg:gap-1 px-0 md:px-6 lg:px-[60px] mb-[40px]">
+              <div>
+                <img
+                  src="assets/images/img297.jpg"
+                  alt=""
+                  className="w-full h-[250px] md:h-[350px] lg:h-[500px] object-cover"
+                />
+              </div>
+
+              <div>
+                <img
+                  src="assets/images/img300.jpg"
+                  alt=""
+                  className="w-full h-[250px] md:h-[350px] lg:h-[500px] object-cover"
+                />
+              </div>
+
+              <div>
+                <img
+                  src="assets/images/img303.jpg"
+                  alt=""
+                  className="w-full h-[250px] md:h-[350px] lg:h-[500px] object-cover"
+                />
+              </div>
+            </div>
+
+            {/* Right Arrow */}
+            <button className="absolute right-0 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 md:p-4 opacity-0 group-hover:opacity-100 transition">
+              ▶
+            </button>
+          </div>
+
+          {/* Stats Section */}
+          <div className="mt-4 border-2 border-dashed border-gray-400 rounded-xl grid grid-cols-1 md:grid-cols-2 text-center mb-4">
+            {/* Left/Top Section */}
+            <div className="py-6 border-b-2 md:border-b-0 md:border-r-2 border-dashed border-gray-400">
+              <h3 className="text-xl md:text-2xl font-semibold text-green-600">
+                200+ Student Members
+              </h3>
+            </div>
+
+            {/* Right/Bottom Section */}
+            <div className="py-6">
+              <h3 className="text-xl md:text-2xl font-semibold text-green-600">
+                50+ Professional Members
+              </h3>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 sm:px-6 md:px-10 lg:px-[110px] py-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Card 1 */}
+          <div className="border border-gray-300 p-4">
+            <div className="rounded-xl overflow-hidden">
+              <img
+                src="assets/images/img324.jpg"
+                alt=""
+                className="h-[200px] sm:h-[220px] md:h-[240px] lg:h-[260px] w-full object-cover rounded-xl"
+              />
+            </div>
+
+            <h3
+              className="font-semibold mt-4 text-[20px] md:text-[22px]"
+              style={{ fontFamily: '"Times New Roman", Times, serif' }}
+            >
+              Advocacy for Recognition
+            </h3>
+
+            <p
+              className="mt-3 text-gray-700 text-justify text-[16px] md:text-[18px]"
+              style={{ fontFamily: '"Times New Roman", Times, serif' }}
+            >
+              Working toward the official recognition of Critical Care
+              Technology/Science under national healthcare frameworks. We
+              collaborate with policymakers, institutions, and stakeholders to
+              secure professional identity and rights
+            </p>
+          </div>
+
+          {/* Card 2 */}
+          <div className="border border-gray-300 p-4">
+            <div className="rounded-xl overflow-hidden">
+              <img
+                src="assets/images/img327.jpg"
+                alt=""
+                className="h-[200px] sm:h-[220px] md:h-[240px] lg:h-[260px] w-full object-cover rounded-xl"
+              />
+            </div>
+
+            <h3
+              className="font-semibold mt-4 text-[20px] md:text-[22px]"
+              style={{ fontFamily: '"Times New Roman", Times, serif' }}
+            >
+              Training & Skill Development
+            </h3>
+
+            <p
+              className="mt-3 text-gray-700 text-justify text-[16px] md:text-[18px]"
+              style={{ fontFamily: '"Times New Roman", Times, serif' }}
+            >
+              Helping students and professionals enhance their knowledge and
+              hands-on ICU skills through structured programs and learning
+              opportunities.
+            </p>
+          </div>
+
+          {/* Card 3 */}
+          <div className="border border-gray-300 p-4">
+            <div className="rounded-xl overflow-hidden">
+              <img
+                src="assets/images/img330.jpg"
+                alt=""
+                className="h-[200px] sm:h-[220px] md:h-[240px] lg:h-[260px] w-full object-cover rounded-xl"
+              />
+            </div>
+
+            <h3
+              className="font-semibold mt-4 text-[20px] md:text-[22px]"
+              style={{ fontFamily: '"Times New Roman", Times, serif' }}
+            >
+              Academic Support & Study Resources
+            </h3>
+
+            <p
+              className="mt-3 text-gray-700 text-justify text-[16px] md:text-[18px]"
+              style={{ fontFamily: '"Times New Roman", Times, serif' }}
+            >
+              Providing structured learning materials, mentorship, and access to
+              essential educational resources for students and practicing
+              professionals in critical care domains.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
