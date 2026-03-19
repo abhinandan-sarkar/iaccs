@@ -45,7 +45,6 @@ const createInitialFormData = () => ({
 const createInitialFiles = () => ({
   photo: null as File | null,
   id_proof: null as File | null,
-  education_doc: null as File | null,
   student_id: null as File | null,
   employment_proof: null as File | null,
   payment_proof: null as File | null,
@@ -98,7 +97,6 @@ export default function Membership() {
   const fileInputRefs = {
     photo: useRef<HTMLInputElement>(null),
     id_proof: useRef<HTMLInputElement>(null),
-    education_doc: useRef<HTMLInputElement>(null),
     student_id: useRef<HTMLInputElement>(null),
     employment_proof: useRef<HTMLInputElement>(null),
     payment_proof: useRef<HTMLInputElement>(null),
@@ -204,7 +202,7 @@ export default function Membership() {
   const loadStatus = async (ref: string) => {
     try {
       const res = await fetch(
-        `hhttp://iaccs.org.in/membership_status_check.php?ref=${encodeURIComponent(
+        `https://iaccs.agcinfosystem.com/membership_status_check.php?ref=${encodeURIComponent(
           ref
         )}`
       );
@@ -350,13 +348,11 @@ export default function Membership() {
       }
     }
 
-    // Education document is required
-    if (!files.education_doc) {
-      newErrors.education_doc = applicantType === "professional" 
-        ? "Provisional Certificate / Final Certificate is required" 
-        : "ID Card / Registration Certificate is required";
-      if (!firstErrorField && fileInputRefs.education_doc.current) {
-        firstErrorField = fileInputRefs.education_doc.current;
+    // ID proof is required
+    if (!files.id_proof) {
+      newErrors.id_proof = "ID Card / Registration Certificate is required";
+      if (!firstErrorField && fileInputRefs.id_proof.current) {
+        firstErrorField = fileInputRefs.id_proof.current;
       }
     }
 
@@ -531,7 +527,7 @@ export default function Membership() {
         }
 
         const response = await fetch(
-          "http://iaccs.org.in/membership_form_submit.php",
+          "https://iaccs.agcinfosystem.com/membership_form_submit.php",
           {
             method: "POST",
             body: formDataToSend,
@@ -652,7 +648,7 @@ export default function Membership() {
       }
 
       const response = await fetch(
-        "http://iaccs.org.in/membership_form_submit.php",
+        "https://iaccs.agcinfosystem.com/membership_form_submit.php",
         {
           method: "POST",
           body: formDataToSend,
@@ -1259,30 +1255,15 @@ export default function Membership() {
                 </div>
 
                 {/* ID Proof Upload */}
-                {/* <div className="space-y-2">
-                  <Label>ID Proof (Aadhaar/Passport/Voter ID) (Optional)</Label>
+                <div className="space-y-2">
+                  <Label>ID Card / Registration Certificate *</Label>
                   <FileUpload
+                    id="file-upload-id-proof"
                     ref={fileInputRefs.id_proof}
                     onChange={(e) => handleFileChange("id_proof", e)}
                     acceptedTypes=".pdf,.jpg,.jpeg,.png"
                     fileName={files.id_proof?.name}
-                  />
-                </div> */}
-
-                {/* Education Document */}
-                <div className="space-y-2">
-                  <Label>
-                    {applicantType === "professional"
-                      ? "Provisional Certificate / Final Certificate *"
-                      : "ID Card / Registration Certificate *"}
-                  </Label>
-                  <FileUpload
-                    id="file-upload-education-doc"
-                    ref={fileInputRefs.education_doc}
-                    onChange={(e) => handleFileChange("education_doc", e)}
-                    acceptedTypes=".pdf,.jpg,.jpeg,.png"
-                    fileName={files.education_doc?.name}
-                    error={errors.education_doc}
+                    error={errors.id_proof}
                   />
                 </div>
 

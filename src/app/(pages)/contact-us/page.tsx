@@ -86,7 +86,7 @@ export default function Contact() {
       formDataToSend.append("subject", formData.subject);
       formDataToSend.append("message", formData.message);
 
-      const response = await fetch("https://iaccs.org.in/contact_form_submit.php", {
+      const response = await fetch("https://iaccs.agcinfosystem.com/contact_form_submit.php", {
         method: "POST",
         body: formDataToSend,
       });

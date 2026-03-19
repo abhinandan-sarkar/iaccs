@@ -34,7 +34,7 @@ export default function MembershipStatus() {
     setLoading(true);
     try {
       const response = await fetch(
-        `hhttp://iaccs.org.in/membership_status_check.php?${params.toString()}`,
+        `https://iaccs.agcinfosystem.com/membership_status_check.php?${params.toString()}`,
         { method: "GET" }
       );
       const data = await response.json();
