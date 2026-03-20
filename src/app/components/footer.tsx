@@ -86,7 +86,7 @@ export default function Footer() {
         </div>
 
         <p className="text-xs md:text-sm opacity-90">
-          Last Updated on - XX/XX/XXXX
+          Last Updated on - 20/03/2026
         </p>
 
       </div>

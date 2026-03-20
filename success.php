@@ -194,12 +194,12 @@ if ($success === true) {
     $form_data['status'] = 'Approved';
 
     function send_admin_notification($form_data, $permanent_file_paths, $reference_number, $payment_id) {
-        $to       = 'admin@iaccs.org.in';
+        $to       = 'admin@iaccs.agcinfosystem.com';
         $to       = 'sk8327656239@gmail.com';
         $subject  = 'New Membership Application (Documents Attached)';
         $boundary = md5(time());
     
-        $headers  = "From: IACCS <noreply@iaccs.org.in>\r\n";
+        $headers  = "From: IACCS <noreply@iaccs.agcinfosystem.com>\r\n";
         $headers .= "Reply-To: {$form_data['email']}\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n";

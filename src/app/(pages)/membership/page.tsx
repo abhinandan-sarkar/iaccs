@@ -93,6 +93,7 @@ export default function Membership() {
   const paymentTransactionRef = useRef<HTMLInputElement>(null);
   const termsRef = useRef<HTMLDivElement>(null);
   const paymentProofSectionRef = useRef<HTMLDivElement>(null);
+  const paymentBarcodeRef = useRef<HTMLDivElement>(null);
 
   const fileInputRefs = {
     photo: useRef<HTMLInputElement>(null),
@@ -290,13 +291,7 @@ export default function Membership() {
 
       // Add focus for accessibility
       setTimeout(() => {
-        if (
-          element instanceof HTMLInputElement ||
-          element instanceof HTMLTextAreaElement ||
-          element instanceof HTMLSelectElement
-        ) {
-          element.focus();
-        }
+        element.focus();
       }, 500);
     }
   };
@@ -578,13 +573,8 @@ export default function Membership() {
               setErrors({});
 
               setTimeout(() => {
-                scrollToElement(paymentProofSectionRef.current);
+                scrollToElement(paymentBarcodeRef.current);
               }, 200);
-
-              window.scrollTo({
-                top: 0,
-                behavior: "smooth",
-              });
             } else {
               let errorMessage =
                 result.error ||
@@ -728,6 +718,18 @@ export default function Membership() {
       : formData.amount === "50"
       ? "/assets/images/50.jpeg"
       : null;
+
+  // When Step 2 opens, focus/scroll to the barcode section
+  useEffect(() => {
+    if (currentStep !== 2) return;
+    if (!paymentBarcodeSrc) return;
+
+    const t = window.setTimeout(() => {
+      scrollToElement(paymentBarcodeRef.current);
+    }, 150);
+
+    return () => window.clearTimeout(t);
+  }, [currentStep, paymentBarcodeSrc]);
 
   const effectiveRef =
     thankYouData?.reference_number || referenceNumber || undefined;
@@ -1335,7 +1337,7 @@ export default function Membership() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className={`w-full sm:w-auto px-8 sm:px-16 py-4 font-semibold rounded-full border-2 border-dashed border-black transition ${
+                      className={`w-full sm:w-auto px-8 sm:px-16 py-4 font-semibold rounded-full border-2 border-solid border-black transition ${
                         isSubmitting
                           ? "opacity-60 cursor-not-allowed"
                           : "hover:opacity-90"
@@ -1392,7 +1394,11 @@ export default function Membership() {
 
                 {paymentBarcodeSrc && (
                   <div className="mb-8">
-                    <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 flex flex-col items-center gap-3">
+                    <div
+                      ref={paymentBarcodeRef}
+                      tabIndex={-1}
+                      className="rounded-lg border border-solid border-gray-300 bg-gray-50 p-4 flex flex-col items-center gap-3"
+                    >
                       <p className="text-sm text-gray-700 font-medium">
                         Scan to pay (₹{formData.amount})
                       </p>
@@ -1446,7 +1452,7 @@ export default function Membership() {
                     <button
                       type="submit"
                       disabled={isSubmitting || isPaymentExpired}
-                      className={`w-full sm:w-auto px-8 sm:px-16 py-4 font-semibold rounded-full border-2 border-dashed border-black transition ${
+                      className={`w-full sm:w-auto px-8 sm:px-16 py-4 font-semibold rounded-full border-2 border-solid border-black transition ${
                         isSubmitting || isPaymentExpired
                           ? "opacity-60 cursor-not-allowed"
                           : "hover:opacity-90"
@@ -1547,7 +1553,7 @@ function ThankYouSection({
             <button
               type="button"
               onClick={onRefresh}
-              className="w-full sm:w-auto px-6 py-3 font-semibold rounded-full border-2 border-dashed border-black transition hover:opacity-90"
+              className="w-full sm:w-auto px-6 py-3 font-semibold rounded-full border-2 border-solid border-black transition hover:opacity-90"
             >
               Refresh Status
             </button>
@@ -1557,7 +1563,7 @@ function ThankYouSection({
               href={data.download_url}
               target="_blank"
               rel="noreferrer"
-              className="w-full sm:w-auto px-6 py-3 font-semibold rounded-full border-2 border-dashed border-black transition hover:opacity-90 text-center"
+              className="w-full sm:w-auto px-6 py-3 font-semibold rounded-full border-2 border-solid border-black transition hover:opacity-90 text-center"
             >
               Download
             </a>
@@ -1565,7 +1571,7 @@ function ThankYouSection({
           <button
             type="button"
             onClick={onNewApplication}
-            className="w-full sm:w-auto px-6 py-3 font-semibold rounded-full border-2 border-dashed border-black transition hover:opacity-90"
+            className="w-full sm:w-auto px-6 py-3 font-semibold rounded-full border-2 border-solid border-black transition hover:opacity-90"
           >
             New Application
           </button>
@@ -1770,7 +1776,7 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
     return (
       <div>
         <div
-          className={`border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-colors duration-300 ${
+          className={`border-2 border-solid rounded-lg p-6 sm:p-8 text-center transition-colors duration-300 ${
             error
               ? "border-red-500 bg-red-50"
               : fileName

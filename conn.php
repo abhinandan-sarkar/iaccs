@@ -19,7 +19,7 @@ if (ENVIRONMENT === 'development') {
     $DB_NAME = 'agcinfos_iaccs'; 
     $DB_USER = 'agcinfos_iaccs';    
     $DB_PASS = 'iaccs#1234X';   
-    define('BASE_URL', 'https://iaccs.org.in'); 
+    define('BASE_URL', 'https://iaccs.agcinfosystem.com'); 
 }
 
 $conn = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);

@@ -1,8 +1,11 @@
 import Link from "next/link";
+import DocumentsList from "@/app/components/documents-list";
+import HashScroll from "@/app/components/hash-scroll";
 
 export default function NoticesAnnouncements() {
   return (
     <div className="bg-white">
+      <HashScroll />
       <section className="w-full bg-white flex flex-col gap-10 py-16 xl:px-[110px] md:px-20 px-5 mt-[40px]">
         <div className="w-full">
           <h1
@@ -28,9 +31,13 @@ export default function NoticesAnnouncements() {
                 Announcements
               </h3>
             </Link>
-            <ul>
-                <li className="text-center">No Records Founds</li>
-            </ul>
+            <DocumentsList
+              type="announcements"
+              limit={0}
+              showDescription
+              className="max-w-4xl mx-auto"
+              listClassName="space-y-3 text-base md:text-lg"
+            />
           </div>
         </div>
 
@@ -43,9 +50,13 @@ export default function NoticesAnnouncements() {
               <img src="/assets/images/img57.png" alt="" width={28} />
               <h3 className="text-lg md:text-xl font-semibold">Notices</h3>
             </Link>
-             <ul>
-                <li className="text-center">No Records Founds</li>
-            </ul>
+            <DocumentsList
+              type="notices"
+              limit={0}
+              showDescription
+              className="max-w-4xl mx-auto"
+              listClassName="space-y-3 text-base md:text-lg"
+            />
           </div>
         </div>
 
@@ -60,9 +71,13 @@ export default function NoticesAnnouncements() {
                 Reports
               </h3>
             </Link>
-             <ul>
-                <li className="text-center">No Records Founds</li>
-            </ul>
+            <DocumentsList
+              type="reports"
+              limit={0}
+              showDescription
+              className="max-w-4xl mx-auto"
+              listClassName="space-y-3 text-base md:text-lg"
+            />
           </div>
         </div>
       </section>

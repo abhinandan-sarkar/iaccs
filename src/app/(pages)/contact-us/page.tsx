@@ -235,11 +235,11 @@ export default function Contact() {
                     <p>
                       <strong>Official Email Address:</strong>
                       <a
-                        href="mailto:admin@iaccs.org.in"
+                        href="mailto:admin@iaccs.agcinfosystem.com"
                         className="text-blue-600 hover:underline ml-1"
                         style={{color:'#1a4075'}}
                       >
-                        admin@iaccs.org.in
+                        admin@iaccs.agcinfosystem.com
                       </a>
                     </p>
                   </div>
@@ -323,7 +323,7 @@ export default function Contact() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-full sm:w-auto px-8 sm:px-16 py-4 font-semibold rounded-full border-2 border-dashed border-black transition ${
+                    className={`w-full sm:w-auto px-8 sm:px-16 py-4 font-semibold rounded-full border-2 border-solid border-black transition ${
                       isSubmitting
                         ? "opacity-60 cursor-not-allowed"
                         : "hover:opacity-90"

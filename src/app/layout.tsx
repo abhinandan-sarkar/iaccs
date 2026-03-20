@@ -100,7 +100,7 @@ export const metadata: Metadata = {
 
     type: 'website',
 
-    url: 'https://iaccs.org.in/',
+    url: 'https://iaccs.agcinfosystem.com/',
 
     title: 'IACCS - Association for Critical Care Sciences and Technology',
 
@@ -110,7 +110,7 @@ export const metadata: Metadata = {
 
       {
 
-        url: 'https://iaccs.org.in/iaccslogo.png',
+        url: 'https://iaccs.agcinfosystem.com/iaccslogo.png',
 
         alt: 'IACCS Logo',
 
@@ -128,7 +128,7 @@ export const metadata: Metadata = {
 
     description: "Join India's premier association for Critical Care and Emergency Medicine professionals. Resources for ICU Technologists, Paramedics, and Allied Health students.",
 
-    images: ['https://iaccs.org.in/iaccslogo.png'], // Next.js will automatically use this for the twitter:image tag
+    images: ['https://iaccs.agcinfosystem.com/iaccslogo.png'], // Next.js will automatically use this for the twitter:image tag
 
   },
 

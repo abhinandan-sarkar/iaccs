@@ -69,7 +69,7 @@ export default function MembershipStatus() {
             Application Status Check
           </h1>
           <p className="text-gray-700 max-w-3xl">
-            Enter your Membership ID and Date of Birth to check your status.
+            Enter your Membership ID / Reference ID and Date of Birth to check your status.
           </p>
         </div>
 
@@ -77,13 +77,13 @@ export default function MembershipStatus() {
           <form onSubmit={handleSubmit} className="grid gap-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Membership ID
+               Membership ID / Reference ID
               </label>
               <input
                 name="membership_id"
                 value={formData.membership_id}
                 onChange={handleChange}
-                placeholder="Enter membership ID"
+                placeholder="Enter membership ID / Reference ID"
                 className="w-full px-4 py-3 bg-white border border-gray-300  focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
               />
             </div>
@@ -104,7 +104,7 @@ export default function MembershipStatus() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`px-4 py-3 font-semibold rounded-full border-2 border-dashed border-black transition ${
+                className={`px-4 py-3 font-semibold rounded-full border-2 border-solid border-black transition ${
                   loading ? "opacity-60 cursor-not-allowed" : "hover:opacity-90"
                 }`}
               >
@@ -121,7 +121,7 @@ export default function MembershipStatus() {
         </div>
 
         {result && (
-          <div className="bg-white border-2 border-dashed border-gray-400  p-6 md:p-8">
+          <div className="bg-white border-2 border-solid border-gray-400  p-6 md:p-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-semibold text-gray-900">
@@ -165,7 +165,7 @@ export default function MembershipStatus() {
               <div className="text-center mt-8">
                 <a
                   href={downloadUrl}
-                  className="inline-block px-8 py-3  border-2 border-dashed border-black rounded-full font-semibold"
+                  className="inline-block px-8 py-3  border-2 border-solid border-black rounded-full font-semibold"
                 >
                   Download E-Certificate (PDF)
                 </a>

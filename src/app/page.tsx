@@ -1,4 +1,6 @@
-﻿import Link from "next/link";
+import Link from "next/link";
+import MemberStats from "./components/member-stats";
+import DocumentsList from "./components/documents-list";
 
 export default function Home() {
   return (
@@ -50,7 +52,7 @@ export default function Home() {
               <Link
                 href="/membership"
                 className="inline-block px-6 md:px-8 py-2 md:py-3 text-gray-900
-          rounded-full border-2 border-dashed border-black
+          rounded-full border-2 border-solid border-black
           hover:opacity-90 transition text-sm md:text-base"
                 style={{
                   backgroundColor: "#38b6ff",
@@ -72,7 +74,7 @@ export default function Home() {
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Vision Card */}
-          <div className="border-2 border-dashed border-gray-500 rounded-2xl bg-white overflow-hidden">
+          <div className="border-2 border-solid border-gray-500 rounded-2xl bg-white overflow-hidden">
             <img
               src="/assets/images/img222.jpg"
               alt="Vision"
@@ -80,7 +82,7 @@ export default function Home() {
             />
 
             <div className="p-5 md:p-6 text-center">
-              <h2 className="inline-block px-5 md:px-6 py-2 text-xl md:text-2xl lg:text-3xl font-bold border-2 border-dashed border-black rounded-full font-serif">
+              <h2 className="inline-block px-5 md:px-6 py-2 text-xl md:text-2xl lg:text-3xl font-bold border-2 border-solid border-black rounded-full font-serif">
                 VISION
               </h2>
 
@@ -96,7 +98,7 @@ export default function Home() {
           </div>
 
           {/* Mission Card */}
-          <div className="border-2 border-dashed border-gray-500 rounded-2xl bg-white overflow-hidden">
+          <div className="border-2 border-solid border-gray-500 rounded-2xl bg-white overflow-hidden">
             <img
               src="/assets/images/img227.jpg"
               alt="Mission"
@@ -104,7 +106,7 @@ export default function Home() {
             />
 
             <div className="p-5 md:p-6 text-center">
-              <h2 className="inline-block px-5 md:px-6 py-2 text-xl md:text-2xl lg:text-3xl font-bold border-2 border-dashed border-black rounded-full font-serif">
+              <h2 className="inline-block px-5 md:px-6 py-2 text-xl md:text-2xl lg:text-3xl font-bold border-2 border-solid border-black rounded-full font-serif">
                 MISSION
               </h2>
 
@@ -189,14 +191,14 @@ export default function Home() {
 
         {/* Button */}
         <div className="text-center mt-10 px-4">
-          <button className="px-8 py-3 bg-[#38b6ff] border-2 border-dashed border-black rounded-full font-semibold">
+          <button className="px-8 py-3 bg-[#38b6ff] border-2 border-solid border-black rounded-full font-semibold">
             View Full list
           </button>
         </div>
 
         {/* Notice */}
         <div className="w-full px-4 sm:px-6 lg:px-[110px] mb-4">
-          <div className="mx-auto mt-8 border-2 border-dashed border-gray-500 rounded-xl p-4 text-red-500 text-center text-sm md:text-base">
+          <div className="mx-auto mt-8 border-2 border-solid border-gray-500 rounded-xl p-4 text-red-500 text-center text-sm md:text-base">
             *Due to some limitations, we are currently unable to publish the
             members list. However we assure you that it will be made available
             at a later date.
@@ -217,19 +219,11 @@ export default function Home() {
                   </h3>
                 </div>
 
-                {/* <ul className="space-y-3 text-base md:text-lg">
-                  <li>
-                    &gt; ABC ..............
-                    <span className="text-pink-500 text-sm ml-2">NEW</span>
-                  </li>
-                  <li>
-                    &gt; Example ..............
-                    <span className="text-pink-500 text-sm ml-2">NEW</span>
-                  </li>
-                  <li>&gt; Example ..............</li>
-                  <li>&gt; Example ..............</li>
-                </ul> */}
-                <span className="block text-center text-gray-700">No Records found</span>
+                <DocumentsList
+                  type="announcements"
+                  limit={5}
+                  showMoreHref="/notices-announcements#announcements"
+                />
 
               </div>
 
@@ -240,16 +234,11 @@ export default function Home() {
                   <h3 className="text-lg md:text-xl font-semibold">Notices</h3>
                 </div>
 
-                {/* <ul className="space-y-3 text-base md:text-lg">
-                  <li>
-                    &gt; Example ..............
-                    <span className="text-pink-500 text-sm ml-2">NEW</span>
-                  </li>
-                  <li>&gt; Example ..............</li>
-                  <li>&gt; Example ..............</li>
-                  <li>&gt; Example ..............</li>
-                </ul> */}
-                <span className="block text-center text-gray-700">No Records found</span>
+                <DocumentsList
+                  type="notices"
+                  limit={5}
+                  showMoreHref="/notices-announcements#notices"
+                />
               </div>
 
               {/* Reports */}
@@ -259,13 +248,11 @@ export default function Home() {
                   <h3 className="text-lg md:text-xl font-semibold">Reports</h3>
                 </div>
 
-                {/* <ul className="space-y-3 text-base md:text-lg">
-                  <li>&gt; Annual Report 2024</li>
-                  <li>&gt; Financial Report</li>
-                  <li>&gt; Membership Report</li>
-                  <li>&gt; Research Report</li>
-                </ul> */}
-                <span className="block text-center text-gray-700">No Records found</span>
+                <DocumentsList
+                  type="reports"
+                  limit={5}
+                  showMoreHref="/notices-announcements#reports"
+                />
               </div>
             </div>
 
@@ -326,21 +313,7 @@ export default function Home() {
           </div>
 
           {/* Stats Section */}
-          <div className="mt-4 border-2 border-dashed border-gray-400 rounded-xl grid grid-cols-1 md:grid-cols-2 text-center mb-4">
-            {/* Left/Top Section */}
-            <div className="py-6 border-b-2 md:border-b-0 md:border-r-2 border-dashed border-gray-400">
-              <h3 className="text-xl md:text-2xl font-semibold text-green-600">
-                200+ Student Members
-              </h3>
-            </div>
-
-            {/* Right/Bottom Section */}
-            <div className="py-6">
-              <h3 className="text-xl md:text-2xl font-semibold text-green-600">
-                50+ Professional Members
-              </h3>
-            </div>
-          </div>
+          <MemberStats />
         </div>
       </section>
 

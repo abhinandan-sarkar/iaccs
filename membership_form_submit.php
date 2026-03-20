@@ -168,6 +168,21 @@ function attachFile(&$message, $file, $boundary) {
     $message .= $content . "\r\n";
 }
 
+function attachFileFromPath(&$message, string $absolutePath, string $boundary, ?string $filename = null): void
+{
+    if ($absolutePath === '' || !is_file($absolutePath)) return;
+
+    $name = $filename ?: basename($absolutePath);
+    $mimeType = detect_mime_type($absolutePath) ?: 'application/octet-stream';
+    $content = chunk_split(base64_encode(file_get_contents($absolutePath)));
+
+    $message .= "--$boundary\r\n";
+    $message .= "Content-Type: {$mimeType}; name=\"{$name}\"\r\n";
+    $message .= "Content-Disposition: attachment; filename=\"{$name}\"\r\n";
+    $message .= "Content-Transfer-Encoding: base64\r\n\r\n";
+    $message .= $content . "\r\n";
+}
+
 function saveUpload($file, $targetDir) {
     if (!$file || !isset($file['tmp_name']) || $file['error'] !== UPLOAD_ERR_OK) {
         return null;
@@ -359,19 +374,101 @@ if ($action === 'payment') {
     }
 
     // Update payment details in DB (if record exists)
-    $payment_status = 'Paid';
+    $payment_status = 'Not Verified';
     $stmt = $conn->prepare("UPDATE membership_requests SET transaction_id = ?, paid_transaction_id_number = ?, paid_transaction_proof = ?, payment_status = ?, payment_date = NOW() WHERE id = ?");
     if ($stmt) {
         $stmt->bind_param("ssssi", $transaction_id, $transaction_id, $paymentProofPath, $payment_status, $record_id);
         $stmt->execute();
     }
 
+    $admin_to = 'admin@iaccs.agcinfosystem.com';
+
+    // Send "New Membership Application" mail after Step 2 (payment submit)
+    $appRow = null;
+    $stmtApp = $conn->prepare("SELECT * FROM membership_requests WHERE id = ? LIMIT 1");
+    if ($stmtApp) {
+        $stmtApp->bind_param("i", $record_id);
+        $stmtApp->execute();
+        $resApp = $stmtApp->get_result();
+        if ($resApp) {
+            $appRow = $resApp->fetch_assoc();
+        }
+    }
+
+    $applicationMailed = false;
+    if (is_array($appRow)) {
+        $subjectApp  = 'New Membership Application (Documents Attached)';
+        $boundaryApp = md5(time() . '_app');
+        $headersApp  = "From: IACCS <noreply@iaccs.agcinfosystem.com>\r\n";
+        $headersApp .= "Reply-To: " . ($appRow['email'] ?? $applicant_email) . "\r\n";
+        $headersApp .= "MIME-Version: 1.0\r\n";
+        $headersApp .= "Content-Type: multipart/mixed; boundary=\"$boundaryApp\"\r\n";
+
+        $htmlBodyApp = "
+<h3>New Membership Application</h3>
+<table border='1' cellpadding='6' cellspacing='0'>
+<tr><th>Reference Number</th><td><b>" . ($appRow['reference_number'] ?? $reference_number) . "</b></td></tr>
+<tr><th>Membership ID</th><td><b>" . ($appRow['membership_id'] ?? '') . "</b></td></tr>
+<tr><th>Membership Plan</th><td><b>" . ($appRow['membership_plan'] ?? '') . "</b></td></tr>
+<tr><th>Amount</th><td><b>Rs. " . ($appRow['amount'] ?? '') . "</b></td></tr>
+<tr><th>Record ID</th><td><b>$record_id</b></td></tr>
+<tr><th>Transaction ID</th><td>" . htmlspecialchars($transaction_id) . "</td></tr>
+<tr><th>Name</th><td>" . ($appRow['name'] ?? '') . "</td></tr>
+<tr><th>Father/Husband Name</th><td>" . ($appRow['father_name'] ?? '') . "</td></tr>
+<tr><th>Date of Birth</th><td>" . ($appRow['dob'] ?? '') . "</td></tr>
+<tr><th>Age</th><td>" . ($appRow['age'] ?? '') . "</td></tr>
+<tr><th>Gender</th><td>" . ($appRow['gender'] ?? '') . "</td></tr>
+<tr><th>Address</th><td>" . ($appRow['address'] ?? '') . "</td></tr>
+<tr><th>City</th><td>" . ($appRow['city'] ?? '') . "</td></tr>
+<tr><th>District</th><td>" . ($appRow['district'] ?? '') . "</td></tr>
+<tr><th>PIN</th><td>" . ($appRow['pin'] ?? '') . "</td></tr>
+<tr><th>State</th><td>" . ($appRow['state'] ?? '') . "</td></tr>
+<tr><th>Mobile</th><td>" . ($appRow['mobile'] ?? '') . "</td></tr>
+<tr><th>Email</th><td>" . ($appRow['email'] ?? '') . "</td></tr>
+<tr><th>Nationality</th><td>" . ($appRow['nationality'] ?? '') . "</td></tr>
+<tr><th>Educational Qualification</th><td>" . ($appRow['education'] ?? '') . "</td></tr>
+<tr><th>Status</th><td>" . ($appRow['education_status'] ?? '') . "</td></tr>
+<tr><th>Academic Session</th><td>" . ($appRow['academic_session'] ?? '') . "</td></tr>
+<tr><th>College/Institution</th><td>" . ($appRow['college_name'] ?? '') . "</td></tr>
+<tr><th>University</th><td>" . ($appRow['university_name'] ?? '') . "</td></tr>
+<tr><th>Currently Employed</th><td>" . ($appRow['employed'] ?? '') . "</td></tr>
+<tr><th>Employment Type</th><td>" . ($appRow['employment_type'] ?? '') . "</td></tr>
+<tr><th>Hospital/Institute</th><td>" . ($appRow['hospital_name'] ?? '') . "</td></tr>
+<tr><th>Designation</th><td>" . ($appRow['designation'] ?? '') . "</td></tr>
+<tr><th>Employee ID</th><td>" . ($appRow['employee_id'] ?? '') . "</td></tr>
+</table>
+";
+
+        $messageApp  = "--$boundaryApp\r\n";
+        $messageApp .= "Content-Type: text/html; charset=UTF-8\r\n\r\n";
+        $messageApp .= $htmlBodyApp . "\r\n";
+
+        $pathsToAttach = [
+            (string)($appRow['photo'] ?? ''),
+            (string)($appRow['id_proof'] ?? ''),
+            (string)($appRow['education_doc'] ?? ''),
+            (string)($appRow['student_id'] ?? ''),
+            (string)($appRow['employment_proof'] ?? ''),
+            (string)($paymentProofPath ?? ''),
+        ];
+
+        foreach ($pathsToAttach as $rel) {
+            $rel = trim(str_replace('\\', '/', $rel));
+            if ($rel === '' || str_starts_with($rel, 'http://') || str_starts_with($rel, 'https://')) continue;
+            if (str_contains($rel, '..')) continue;
+            $abs = __DIR__ . '/' . ltrim($rel, '/');
+            attachFileFromPath($messageApp, $abs, $boundaryApp);
+        }
+
+        $messageApp .= "--$boundaryApp--";
+        $applicationMailed = mail($admin_to, $subjectApp, $messageApp, $headersApp);
+    }
+
     // Email admin with payment details
-    // $to = 'admin@iaccs.org.in';
-    $to = 'abhinandansarkar@gamil.com';
+    $to = $admin_to;
     $subject = 'Payment Confirmation - ACCS Membership';
     $boundary = md5(time());
-    $headers  = "From: IACCS <noreply@iaccs.org.in>\r\n";
+    $headers  = "From: IACCS <noreply@iaccs.agcinfosystem.com>\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n";
 
@@ -388,12 +485,15 @@ if ($action === 'payment') {
     $message .= "Content-Type: text/html; charset=UTF-8\r\n\r\n";
     $message .= $htmlBody . "\r\n";
 
-    attachFile($message, $payment_proof, $boundary);
+    if (!empty($paymentProofPath)) {
+        $absProof = __DIR__ . '/' . ltrim(str_replace('\\', '/', $paymentProofPath), '/');
+        attachFileFromPath($message, $absProof, $boundary);
+    }
     $message .= "--$boundary--";
 
     $adminMailed = mail($to, $subject, $message, $headers);
 
-    if ($adminMailed && !empty($applicant_email)) {
+    if (!empty($applicant_email)) {
         send_payment_confirmation_mail(
             $applicant_email,
             $applicant_name ?: 'Applicant',
@@ -534,7 +634,7 @@ function send_thank_you_mail($toEmail, $name, $membership_plan, $amount, $refere
     $boundary = md5(time());
 
     $headers  = "From: IACCS <abhinandansarkar00@gmail.com>\r\n";
-    // $headers  = "From: IACCS <noreply@iaccs.org.in>\r\n";
+    // $headers  = "From: IACCS <noreply@iaccs.agcinfosystem.com>\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: multipart/related; boundary=\"$boundary\"\r\n";
 
@@ -553,7 +653,7 @@ To complete the membership process, please proceed with the payment using the fo
 
 Upon confirmation of payment, your application will be reviewed. Membership approval and further communication will be shared with you within 3-5 working days.
 
-For any assistance or queries, please contact us at admin@iaccs.org.in. We'll get back to you promptly, usually within 1-2 working days.
+For any assistance or queries, please contact us at admin@iaccs.agcinfosystem.com. We'll get back to you promptly, usually within 1-2 working days.
 
 Thank you for choosing to join the ACCS community. We are excited to have you on board!
 
@@ -592,7 +692,7 @@ Association for Critical Care Sciences (ACCS)";
 
 function send_payment_confirmation_mail($toEmail, $name, $reference_number, $transaction_id) {
     $subject = 'Payment Received - ACCS Membership';
-    $headers  = "From: IACCS <noreply@iaccs.org.in>\r\n";
+    $headers  = "From: IACCS <noreply@iaccs.agcinfosystem.com>\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
 
@@ -768,13 +868,13 @@ if (!empty($errors)) {
 /* ===============================
    Email Setup
 ================================ */
-// $to       = 'admin@iaccs.org.in';
+// $to       = 'admin@iaccs.agcinfosystem.com';
  $to       = 'abhinandansarkar00@gmail.com';
 $subject  = 'New Membership Application (Documents Attached)';
 $boundary = md5(time());
 
 $headers  = "From: IACCS <abhinandansarkar00@gmail.com>\r\n";
-// $headers  = "From: IACCS <noreply@iaccs.org.in>\r\n";
+// $headers  = "From: IACCS <noreply@iaccs.agcinfosystem.com>\r\n";
 $headers .= "Reply-To: $email\r\n";
 $headers .= "MIME-Version: 1.0\r\n";
 $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n";

@@ -210,7 +210,7 @@ function send_verification_complete_email($user)
 
     $boundary = md5(time());
 
-    $headers  = "From: IACCS <noreply@iaccs.org.in>\r\n";
+    $headers  = "From: IACCS <noreply@iaccs.agcinfosystem.com>\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: multipart/related; boundary=\"$boundary\"\r\n";
 
@@ -227,7 +227,7 @@ function send_verification_complete_email($user)
 
     We look forward to your active participation and contribution to the field of critical care sciences.
 
-    If you have any questions regarding your membership or require further assistance, please do not hesitate to contact us at admin@iaccs.org.in.
+    If you have any questions regarding your membership or require further assistance, please do not hesitate to contact us at admin@iaccs.agcinfosystem.com.
 
     Regards,
     Association for Critical Care Sciences (ACCS)";
