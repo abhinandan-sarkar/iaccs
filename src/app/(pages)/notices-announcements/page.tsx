@@ -34,7 +34,6 @@ export default function NoticesAnnouncements() {
             <DocumentsList
               type="announcements"
               limit={0}
-              showDescription
               className="max-w-4xl mx-auto"
               listClassName="space-y-3 text-base md:text-lg"
             />
@@ -53,7 +52,6 @@ export default function NoticesAnnouncements() {
             <DocumentsList
               type="notices"
               limit={0}
-              showDescription
               className="max-w-4xl mx-auto"
               listClassName="space-y-3 text-base md:text-lg"
             />
@@ -74,7 +72,6 @@ export default function NoticesAnnouncements() {
             <DocumentsList
               type="reports"
               limit={0}
-              showDescription
               className="max-w-4xl mx-auto"
               listClassName="space-y-3 text-base md:text-lg"
             />

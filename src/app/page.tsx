@@ -191,9 +191,12 @@ export default function Home() {
 
         {/* Button */}
         <div className="text-center mt-10 px-4">
-          <button className="px-8 py-3 bg-[#38b6ff] border-2 border-solid border-black rounded-full font-semibold">
+          <Link
+            href="/about-us"
+            className="inline-block px-8 py-3 bg-[#38b6ff] border-2 border-solid border-black rounded-full font-semibold"
+          >
             View Full list
-          </button>
+          </Link>
         </div>
 
         {/* Notice */}
@@ -221,7 +224,7 @@ export default function Home() {
 
                 <DocumentsList
                   type="announcements"
-                  limit={5}
+                  limit={10}
                   showMoreHref="/notices-announcements#announcements"
                 />
 
@@ -236,7 +239,7 @@ export default function Home() {
 
                 <DocumentsList
                   type="notices"
-                  limit={5}
+                  limit={10}
                   showMoreHref="/notices-announcements#notices"
                 />
               </div>
@@ -250,7 +253,7 @@ export default function Home() {
 
                 <DocumentsList
                   type="reports"
-                  limit={5}
+                  limit={10}
                   showMoreHref="/notices-announcements#reports"
                 />
               </div>
