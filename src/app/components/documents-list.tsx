@@ -2,50 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-
-export type DocumentType = "announcements" | "notices" | "reports";
-
-type DocumentItem = {
-  title: string;
-  description?: string;
-  url?: string | null;
-  fileName?: string;
-  createdAt?: string | null;
-  updatedAt?: string;
-};
-
-type DocumentsResponse = {
-  success: boolean;
-  type?: DocumentType;
-  total?: number;
-  limit?: number;
-  offset?: number;
-  items?: DocumentItem[];
-  message?: string;
-};
-
-function getDocumentsBaseUrl() {
-  const host = window.location.hostname;
-  if (host === "localhost" || host === "127.0.0.1") {
-    return "http://localhost/iaccs/documents_list.php";
-  }
-  if (host.endsWith("agcinfosystem.com")) {
-    return "https://iaccs.agcinfosystem.com/documents_list.php";
-  }
-  return "/documents_list.php";
-}
-
-function buildDocumentsUrl(params: {
-  type: DocumentType;
-  limit?: number;
-  offset?: number;
-}) {
-  const baseUrl = getDocumentsBaseUrl();
-  const search = new URLSearchParams({ type: params.type });
-  if (typeof params.limit === "number") search.set("limit", String(params.limit));
-  if (typeof params.offset === "number") search.set("offset", String(params.offset));
-  return `${baseUrl}?${search.toString()}`;
-}
+import {
+  buildDocumentsUrl,
+  type DocumentItem,
+  type DocumentType,
+  type DocumentsResponse,
+} from "@/app/lib/documents";
 
 export default function DocumentsList(props: {
   type: DocumentType;
@@ -61,7 +23,11 @@ export default function DocumentsList(props: {
 
   const url = useMemo(() => {
     if (typeof window === "undefined") return "";
-    return buildDocumentsUrl({ type: props.type, limit });
+    return buildDocumentsUrl({
+      type: props.type,
+      limit,
+      hostname: window.location.hostname,
+    });
   }, [props.type, limit]);
 
   useEffect(() => {
@@ -105,35 +71,72 @@ export default function DocumentsList(props: {
     );
   }
 
+  const nowMs = Date.now();
+  const tenDaysMs = 10 * 24 * 60 * 60 * 1000;
+  const isNewItem = (dateValue?: string | null) => {
+    if (!dateValue) return false;
+    const parsed = Date.parse(dateValue);
+    if (Number.isNaN(parsed)) return false;
+    return nowMs - parsed <= tenDaysMs;
+  };
+
   return (
     <div className={props.className}>
       {items.length === 0 ? (
         <div className="text-center text-gray-700">No Records found</div>
       ) : (
-        <ul className={props.listClassName ?? "space-y-3 text-base md:text-lg"}>
+        <ul className={props.listClassName ?? "space-y-1 text-base md:text-lg"}>
           {items.map((item, idx) => (
             <li
               key={`${item.url ?? item.fileName ?? item.title}-${idx}`}
-              className="flex items-center justify-between gap-3"
+              className="rounded-xl px-4 py-1 shadow-sm transition hover:shadow text-[14px]"
             >
-              <div className="text-left break-words">
-                <div className="text-gray-800">&gt; {item.title}</div>
-                {props.showDescription && item.description?.trim() ? (
-                  <div className="mt-1 text-sm text-gray-600">
-                    {item.description}
-                  </div>
-                ) : null}
-              </div>
-
               {item.url ? (
                 <a
                   href={item.url}
                   download
-                  className="shrink-0 px-4 py-1 rounded-full bg-[#38b6ff] border border-black text-sm font-semibold hover:opacity-90 transition"
+                  className="flex items-center justify-between gap-3 w-full"
                 >
-                  Download
+                  <div className="text-left break-words">
+                    <div className="text-gray-800">&gt; {item.title}</div>
+                    {props.showDescription && item.description?.trim() ? (
+                      <div className="mt-1 text-sm text-gray-600">
+                        {item.description}
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div className="shrink-0 flex items-center gap-2">
+                    {isNewItem(item.createdAt ?? item.updatedAt) ? (
+                      <span className="inline-flex items-center text-xs font-extrabold uppercase tracking-wide bg-gradient-to-r from-pink-500 via-amber-400 to-emerald-400 bg-clip-text text-transparent animate-pulse">
+                        New
+                      </span>
+                    ) : null}
+                    <span className="text-sm font-semibold text-blue-700 underline underline-offset-2 hover:text-blue-900">
+                      Download
+                    </span>
+                  </div>
                 </a>
-              ) : null}
+              ) : (
+                <div className="flex items-center justify-between gap-3 w-full">
+                  <div className="text-left break-words">
+                    <div className="text-gray-800">&gt; {item.title}</div>
+                    {props.showDescription && item.description?.trim() ? (
+                      <div className="mt-1 text-sm text-gray-600">
+                        {item.description}
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div className="shrink-0 flex items-center gap-2">
+                    {isNewItem(item.createdAt ?? item.updatedAt) ? (
+                      <span className="inline-flex items-center text-xs font-extrabold uppercase tracking-wide bg-gradient-to-r from-pink-500 via-amber-400 to-emerald-400 bg-clip-text text-transparent animate-pulse">
+                        New
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              )}
             </li>
           ))}
         </ul>
