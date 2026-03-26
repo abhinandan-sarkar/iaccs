@@ -159,7 +159,7 @@ $appStatus = ucfirst(strtolower($data['status'] ?? 'Pending'));
                 <ul style="margin: 12px 0 0 18px; padding:0; list-style:disc;">
                     <li>You will receive an email with your e-certificate after approval.</li>
                     <li>If payment is pending, please complete it using the QR shared with you.</li>
-                    <li>Need help? Write to <a href="mailto:admin@iaccs.agcinfosystem.com">admin@iaccs.agcinfosystem.com</a>.</li>
+                    <li>Need help? Write to <a href="mailto:admin@iaccs.org.in">admin@iaccs.org.in</a>.</li>
                 </ul>
             </div>
 

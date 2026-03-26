@@ -31,7 +31,7 @@ if (ENVIRONMENT === 'development') {
     $db_name = 'agcinfos_iaccs'; 
     $db_user = 'agcinfos_iaccs';    
     $db_pass = 'iaccs#1234X';   
-    $base_url = 'https://iaccs.agcinfosystem.com/';
+    $base_url = 'https://iaccs.org.in/';
 }
           
 $table   = 'membership_requests'; 

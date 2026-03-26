@@ -1,6 +1,24 @@
 "use client";
 import { useState } from "react";
 
+function getPhpBaseUrl() {
+  if (typeof window === "undefined") return "";
+  const host = window.location.hostname;
+  if (host === "localhost" || host === "127.0.0.1") {
+    return "http://localhost/iaccs";
+  }
+  if (host.endsWith("agcinfosystem.com")) {
+    return "https://iaccs.org.in";
+  }
+  return "";
+}
+
+function buildPhpUrl(path) {
+  const base = getPhpBaseUrl();
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return base ? `${base}${normalizedPath}` : normalizedPath;
+}
+
 export default function MembershipStatus() {
   const [formData, setFormData] = useState({
     membership_id: "",
@@ -34,7 +52,7 @@ export default function MembershipStatus() {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://iaccs.agcinfosystem.com/membership_status_check.php?${params.toString()}`,
+        `${buildPhpUrl("membership_status_check.php")}?${params.toString()}`,
         { method: "GET" }
       );
       const data = await response.json();
@@ -43,7 +61,7 @@ export default function MembershipStatus() {
         return;
       }
       setResult(data);
-    } catch (err) {
+    } catch {
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);
@@ -55,6 +73,8 @@ export default function MembershipStatus() {
   const normalizedStatus = status.trim().toLowerCase();
   const isApproved =
     normalizedStatus === "approved" || normalizedStatus === "approve";
+  const normalizedPaymentStatus = paymentStatus.trim().toLowerCase();
+  const isPaid = normalizedPaymentStatus === "paid";
   const downloadUrl =
     result?.download_url || result?.data?.download_url || "";
 
@@ -114,7 +134,7 @@ export default function MembershipStatus() {
           </form>
 
           {error && (
-            <div className="mt-6 text-center text-red-600 font-medium">
+            <div className="mt-6 text-center text-red-500 font-medium">
               {error}
             </div>
           )}
@@ -131,14 +151,42 @@ export default function MembershipStatus() {
                   Reference: {result.data.reference_number || "N/A"}
                 </p>
               </div>
-              <div className="flex gap-3">
-                <span className="px-4 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-800">
-                  {status || "Unknown"}
-                </span>
-                <span className="px-4 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-800">
-                  {paymentStatus || "Unpaid"}
-                </span>
-              </div>
+              <div className="flex items-center gap-2">
+    <span className="w-[180px] text-sm font-semibold text-gray-700">
+      Membership Status:
+    </span>
+    <span
+      className={`px-4 py-1 rounded-full text-xs font-semibold
+        ${
+          status === "Approved"
+            ? "bg-green-50 text-green-700"
+            : status === "Pending"
+            ? "bg-yellow-50 text-yellow-700"
+            : "bg-red-50 text-red-700"
+        }`}
+    >
+      {status || "Unknown"}
+    </span>
+  </div>
+
+  {/* Payment Status */}
+  <div className="flex items-center gap-2">
+    <span className="w-[180px] text-sm font-semibold text-gray-700">
+      Payment Status:
+    </span>
+    <span
+      className={`px-4 py-1 rounded-full text-xs font-semibold
+        ${
+          paymentStatus === "Paid"
+            ? "bg-green-50 text-green-700"
+            : paymentStatus === "Pending"
+            ? "bg-yellow-50 text-yellow-700"
+            : "bg-red-50 text-red-700"
+        }`}
+    >
+      {paymentStatus || "Unpaid"}
+    </span>
+  </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 mt-6 text-gray-700">
@@ -161,7 +209,7 @@ export default function MembershipStatus() {
               </div>
             </div>
 
-            {isApproved && downloadUrl && (
+            {isApproved && isPaid && downloadUrl && (
               <div className="text-center mt-8">
                 <a
                   href={downloadUrl}
@@ -171,9 +219,11 @@ export default function MembershipStatus() {
                 </a>
               </div>
             )}
-            {!isApproved && (
-              <div className="text-center mt-8 text-sm text-gray-600">
-                E-Certificate download is available after approval.
+            {(!isApproved || !isPaid) && (
+              <div className="text-center mt-8 text-sm text-red-400">
+                {!isApproved
+                  ? "E-Certificate download is available after approval."
+                  : "Please complete your payment to download your E-certificate (PDF). If you have already paid, please ignore this message."}
               </div>
             )}
           </div>

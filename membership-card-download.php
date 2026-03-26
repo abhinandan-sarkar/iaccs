@@ -24,10 +24,10 @@ if ($reference === '' && $membership_id === '') {
 }
 
 if ($reference !== '') {
-    $stmt = $conn->prepare("SELECT * FROM membership_requests WHERE reference_number = ? AND status = 'Approved' LIMIT 1");
+    $stmt = $conn->prepare("SELECT * FROM membership_requests WHERE reference_number = ? AND status = 'Approved' AND LOWER(payment_status) = 'paid' LIMIT 1");
     $stmt->bind_param("s", $reference);
 } else {
-    $stmt = $conn->prepare("SELECT * FROM membership_requests WHERE membership_id = ? AND status = 'Approved' LIMIT 1");
+    $stmt = $conn->prepare("SELECT * FROM membership_requests WHERE membership_id = ? AND status = 'Approved' AND LOWER(payment_status) = 'paid' LIMIT 1");
     $stmt->bind_param("s", $membership_id);
 }
 
@@ -38,7 +38,7 @@ $stmt->close();
 
 if (!$row) {
     http_response_code(404);
-    echo 'Membership not approved or not found.';
+    echo 'Membership not approved/paid or not found.';
     exit;
 }
 
@@ -51,4 +51,3 @@ if ($type === 'card') {
 generate_membership_card($row, 'Membership_Card.pdf', 'D');
    
 }
-

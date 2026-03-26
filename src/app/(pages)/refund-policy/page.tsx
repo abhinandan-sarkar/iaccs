@@ -55,10 +55,10 @@ export default function RefundPolicy() {
                 For specific events or workshops, cancellation requests must be
                 sent to{" "}
                 <a
-                  href="mailto:admin@iaccs.agcinfosystem.com"
+                  href="mailto:admin@iaccs.org.in"
                   className="text-blue-600 hover:underline"
                 >
-                  admin@iaccs.agcinfosystem.com
+                  admin@iaccs.org.in
                 </a>{" "}
                 at least <strong>7 days prior</strong> to the event date to be
                 eligible for a refund (minus processing fees).
@@ -109,13 +109,13 @@ export default function RefundPolicy() {
             <p>
               <strong>Email:</strong>{" "}
               <a
-                href="mailto:admin@iaccs.agcinfosystem.com"
+                href="mailto:admin@iaccs.org.in"
                 className="text-blue-600 hover:underline"
               >
-                admin@iaccs.agcinfosystem.com
+                admin@iaccs.org.in
               </a>
               <br />
-              <strong>Address:</strong> 168, Mathkal, Nazrul Sarani, Dumdum
+              <strong>Address:</strong> Mathkal, Nazrul Sarani, Dumdum
               Cantonment, Kolkata, 700065
             </p>
           </div>

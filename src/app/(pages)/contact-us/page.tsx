@@ -86,7 +86,7 @@ export default function Contact() {
       formDataToSend.append("subject", formData.subject);
       formDataToSend.append("message", formData.message);
 
-      const response = await fetch("https://iaccs.agcinfosystem.com/contact_form_submit.php", {
+      const response = await fetch("https://iaccs.org.in/contact_form_submit.php", {
         method: "POST",
         body: formDataToSend,
       });
@@ -229,17 +229,17 @@ export default function Contact() {
 
                   <div className="space-y-4 text-gray-700 text-base md:text-lg">
                     <p>
-                      <strong>Address:</strong> 168, Mathkal, Nazrul Sarani, Dumdum Cantonment,
+                      <strong>Address:</strong> Mathkal, Nazrul Sarani, Dumdum Cantonment,
                       Kolkata, 700065
                     </p>
                     <p>
                       <strong>Official Email Address:</strong>
                       <a
-                        href="mailto:admin@iaccs.agcinfosystem.com"
+                        href="mailto:admin@iaccs.org.in"
                         className="text-blue-600 hover:underline ml-1"
                         style={{color:'#1a4075'}}
                       >
-                        admin@iaccs.agcinfosystem.com
+                        admin@iaccs.org.in
                       </a>
                     </p>
                   </div>

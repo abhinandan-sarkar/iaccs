@@ -381,7 +381,7 @@ if ($action === 'payment') {
         $stmt->execute();
     }
 
-    $admin_to = 'admin@iaccs.agcinfosystem.com';
+    $admin_to = 'admin@iaccs.org.in';
 
     // Send "New Membership Application" mail after Step 2 (payment submit)
     $appRow = null;
@@ -399,7 +399,7 @@ if ($action === 'payment') {
     if (is_array($appRow)) {
         $subjectApp  = 'New Membership Application (Documents Attached)';
         $boundaryApp = md5(time() . '_app');
-        $headersApp  = "From: IACCS <noreply@iaccs.agcinfosystem.com>\r\n";
+        $headersApp  = "From: IACCS <noreply@iaccs.org.in>\r\n";
         $headersApp .= "Reply-To: " . ($appRow['email'] ?? $applicant_email) . "\r\n";
         $headersApp .= "MIME-Version: 1.0\r\n";
         $headersApp .= "Content-Type: multipart/mixed; boundary=\"$boundaryApp\"\r\n";
@@ -468,7 +468,7 @@ if ($action === 'payment') {
     $to = $admin_to;
     $subject = 'Payment Confirmation - ACCS Membership';
     $boundary = md5(time());
-    $headers  = "From: IACCS <noreply@iaccs.agcinfosystem.com>\r\n";
+    $headers  = "From: IACCS <noreply@iaccs.org.in>\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n";
 
@@ -504,7 +504,7 @@ if ($action === 'payment') {
 
     $base_url = (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1'))
         ? 'http://localhost/iaccs/'
-        : 'https://iaccs.agcinfosystem.com/';
+        : 'https://iaccs.org.in/';
 
     echo json_encode([
         'success' => true,
@@ -629,12 +629,12 @@ function send_thank_you_mail($toEmail, $name, $membership_plan, $amount, $refere
 
     // QR image path (local server path)
     $qrPath = __DIR__ . '/google_pay.jpg'; // <-- save QR image with this name
-    $qrCid  = 'https://iaccs.agcinfosystem.com/google_pay.jpg';
+    $qrCid  = 'https://iaccs.org.in/google_pay.jpg';
 
     $boundary = md5(time());
 
     $headers  = "From: IACCS <abhinandansarkar00@gmail.com>\r\n";
-    // $headers  = "From: IACCS <noreply@iaccs.agcinfosystem.com>\r\n";
+    // $headers  = "From: IACCS <noreply@iaccs.org.in>\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: multipart/related; boundary=\"$boundary\"\r\n";
 
@@ -653,7 +653,7 @@ To complete the membership process, please proceed with the payment using the fo
 
 Upon confirmation of payment, your application will be reviewed. Membership approval and further communication will be shared with you within 3-5 working days.
 
-For any assistance or queries, please contact us at admin@iaccs.agcinfosystem.com. We'll get back to you promptly, usually within 1-2 working days.
+For any assistance or queries, please contact us at admin@iaccs.org.in. We'll get back to you promptly, usually within 1-2 working days.
 
 Thank you for choosing to join the ACCS community. We are excited to have you on board!
 
@@ -692,7 +692,7 @@ Association for Critical Care Sciences (ACCS)";
 
 function send_payment_confirmation_mail($toEmail, $name, $reference_number, $transaction_id) {
     $subject = 'Payment Received - ACCS Membership';
-    $headers  = "From: IACCS <noreply@iaccs.agcinfosystem.com>\r\n";
+    $headers  = "From: IACCS <noreply@iaccs.org.in>\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
 
@@ -868,13 +868,13 @@ if (!empty($errors)) {
 /* ===============================
    Email Setup
 ================================ */
-// $to       = 'admin@iaccs.agcinfosystem.com';
+// $to       = 'admin@iaccs.org.in';
  $to       = 'abhinandansarkar00@gmail.com';
 $subject  = 'New Membership Application (Documents Attached)';
 $boundary = md5(time());
 
 $headers  = "From: IACCS <abhinandansarkar00@gmail.com>\r\n";
-// $headers  = "From: IACCS <noreply@iaccs.agcinfosystem.com>\r\n";
+// $headers  = "From: IACCS <noreply@iaccs.org.in>\r\n";
 $headers .= "Reply-To: $email\r\n";
 $headers .= "MIME-Version: 1.0\r\n";
 $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n";

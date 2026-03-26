@@ -2,8 +2,8 @@
   RewriteEngine On
   RewriteBase /
   
-  RewriteRule ^pricing/?$ https://iaccs.agcinfosystem.com/pricing.html [L,R=301]
-  RewriteRule ^membership/?$ https://iaccs.agcinfosystem.com/membership.html [L,R=301]
+  RewriteRule ^pricing/?$ https://iaccs.org.in/pricing.html [L,R=301]
+  RewriteRule ^membership/?$ https://iaccs.org.in/membership.html [L,R=301]
 
   # 1. FIX THE ASSET PATHS
   # If any request contains "_next", ignore the directory prefix and serve from root

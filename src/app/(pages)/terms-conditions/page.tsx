@@ -26,7 +26,7 @@ export default function TermsConditions() {
               <strong>Welcome to our website.</strong>
             </p>
             <p>
-              This website is owned and operated by <strong>BAPAN SARKAR</strong>
+              This website is owned and operated by <strong>The Association for Critical Care Sciences</strong>
               . By accessing or using this website, you agree to be bound by the
               terms and conditions set forth below.
             </p>
@@ -39,12 +39,12 @@ export default function TermsConditions() {
               official contact details below:
             </p>
             <p>
-              <strong>Operator/Owner Name:</strong> Bapan Sarkar
+              <strong>Operator/Owner Name:</strong> The Association for Critical Care Sciences
               <br />
-              <strong>Business Address:</strong> 168, Mathkal, Nazrul Sarani,
+              <strong>Business Address:</strong> Mathkal, Nazrul Sarani,
               Dumdum Cantonment, Kolkata, West Bengal - 700065
               <br />
-              <strong>Official Email:</strong> admin@iaccs.agcinfosystem.com
+              <strong>Official Email:</strong> admin@iaccs.org.in
               <br />
               <strong>Contact Number:</strong> +91 8918505434
             </p>
@@ -216,13 +216,13 @@ export default function TermsConditions() {
             <p>
               <strong>Email:</strong>{" "}
               <a
-                href="mailto:admin@iaccs.agcinfosystem.com"
+                href="mailto:admin@iaccs.org.in"
                 className="text-blue-600 hover:underline"
               >
-                admin@iaccs.agcinfosystem.com
+                admin@iaccs.org.in
               </a>
               <br />
-              <strong>Address:</strong> 168, Mathkal, Nazrul Sarani, Dumdum
+              <strong>Address:</strong> Mathkal, Nazrul Sarani, Dumdum
               Cantonment, Kolkata, 700065
             </p>
           </div>

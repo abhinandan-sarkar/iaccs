@@ -78,10 +78,12 @@ if (!$row) {
 
 $base_url = (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1'))
     ? 'http://localhost/iaccs/'
-    : 'https://iaccs.agcinfosystem.com/';
+    : 'https://iaccs.org.in/';
 
 $download_url = '';
-if (strtolower($row['status'] ?? '') === 'approved') {
+$normalized_status = strtolower(trim($row['status'] ?? ''));
+$normalized_payment_status = strtolower(trim($row['payment_status'] ?? ''));
+if ($normalized_status === 'approved' && $normalized_payment_status === 'paid') {
     $download_url = $base_url . 'membership-card-download.php?ref=' . urlencode($row['reference_number']);
 }
 

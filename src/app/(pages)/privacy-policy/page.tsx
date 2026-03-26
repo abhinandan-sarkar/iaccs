@@ -23,7 +23,7 @@ export default function PrivacyPolicy() {
 
           <div className="space-y-4">
             <p>
-              Welcome to iaccs.agcinfosystem.com. We value your trust and are
+              Welcome to iaccs.org.in. We value your trust and are
               committed to protecting your personal information. This Privacy
               Policy outlines how we collect, use, and safeguard your data when
               you visit our website and use our services.
@@ -162,15 +162,15 @@ export default function PrivacyPolicy() {
               <br />
               <strong>Title:</strong> Grievance Officer
               <br />
-              <strong>Address:</strong> 168, Mathkal, Nazrul Sarani, Dumdum
+              <strong>Address:</strong> Mathkal, Nazrul Sarani, Dumdum
               Cantonment, Kolkata, 700065
               <br />
               <strong>Email:</strong>{" "}
               <a
-                href="mailto:admin@iaccs.agcinfosystem.com"
+                href="mailto:admin@iaccs.org.in"
                 className="text-blue-600 hover:underline"
               >
-                admin@iaccs.agcinfosystem.com
+                admin@iaccs.org.in
               </a>
             </p>
           </div>
@@ -196,13 +196,13 @@ export default function PrivacyPolicy() {
             <p>
               <strong>Email:</strong>{" "}
               <a
-                href="mailto:admin@iaccs.agcinfosystem.com"
+                href="mailto:admin@iaccs.org.in"
                 className="text-blue-600 hover:underline"
               >
-                admin@iaccs.agcinfosystem.com
+                admin@iaccs.org.in
               </a>
               <br />
-              <strong>Address:</strong> 168, Mathkal, Nazrul Sarani, Dumdum
+              <strong>Address:</strong> Mathkal, Nazrul Sarani, Dumdum
               Cantonment, Kolkata, 700065
             </p>
           </div>

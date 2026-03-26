@@ -2,6 +2,28 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 
+function getPhpBaseUrl() {
+  if (typeof window === "undefined") return "";
+  const host = window.location.hostname;
+  if (host === "localhost" || host === "127.0.0.1") {
+    return "http://localhost/iaccs";
+  }
+  if (host.endsWith("agcinfosystem.com")) {
+    return "https://iaccs.org.in";
+  }
+  return "";
+}
+
+function buildPhpUrl(path: string) {
+  const base = getPhpBaseUrl();
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return base ? `${base}${normalizedPath}` : normalizedPath;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
 const createInitialFormData = () => ({
   // Personal Information
   name: "",
@@ -83,6 +105,7 @@ export default function Membership() {
     payment_status?: string;
     status?: string;
     download_url?: string;
+    message?: string;
   } | null>(null);
 
   // Refs for scroll to field
@@ -202,32 +225,73 @@ export default function Membership() {
 
   const loadStatus = async (ref: string) => {
     try {
-      const res = await fetch(
-        `https://iaccs.agcinfosystem.com/membership_status_check.php?ref=${encodeURIComponent(
-          ref
-        )}`
-      );
-      const json = await res.json();
-      if (json.success) {
+      const url = `${buildPhpUrl(
+        "membership_status_check.php"
+      )}?ref=${encodeURIComponent(ref)}`;
+      const res = await fetch(url, { method: "GET", cache: "no-store" });
+      const raw = await res.text();
+
+      let json: unknown;
+      try {
+        json = JSON.parse(raw);
+      } catch (err) {
+        console.error("Invalid JSON from membership_status_check.php", {
+          url,
+          status: res.status,
+          raw: raw.slice(0, 250),
+          err,
+        });
+        throw err;
+      }
+
+      if (!isRecord(json)) throw new Error("Invalid response shape");
+
+      const data = isRecord(json.data) ? json.data : undefined;
+      const downloadUrl =
+        typeof json.download_url === "string"
+          ? json.download_url
+          : typeof data?.download_url === "string"
+          ? data.download_url
+          : "";
+
+      if (json.success === true) {
         setThankYouData({
-          reference_number: json.data?.reference_number,
-          membership_id: json.data?.membership_id,
-          payment_status: json.data?.payment_status,
-          status: json.data?.status,
-          download_url: json.download_url,
+          reference_number:
+            typeof data?.reference_number === "string"
+              ? data.reference_number
+              : undefined,
+          membership_id:
+            typeof data?.membership_id === "string" ? data.membership_id : undefined,
+          payment_status:
+            typeof data?.payment_status === "string"
+              ? data.payment_status
+              : undefined,
+          status: typeof data?.status === "string" ? data.status : undefined,
+          download_url: downloadUrl || undefined,
+          message: undefined,
         });
       } else {
         setThankYouData({
           reference_number: ref,
-          payment_status: "Pending",
-          status: "Pending",
+          payment_status: undefined,
+          status: undefined,
+          membership_id: undefined,
+          download_url: undefined,
+          message:
+            typeof json.message === "string" && json.message.trim()
+              ? json.message
+              : "Unable to fetch status. Please try again.",
         });
       }
-    } catch {
+    } catch (err) {
+      console.error("Failed to load membership status", err);
       setThankYouData({
         reference_number: ref,
-        payment_status: "Pending",
-        status: "Pending",
+        payment_status: undefined,
+        status: undefined,
+        membership_id: undefined,
+        download_url: undefined,
+        message: "Unable to fetch status right now. Please try again.",
       });
     }
   };
@@ -522,7 +586,7 @@ export default function Membership() {
         }
 
         const response = await fetch(
-          "https://iaccs.agcinfosystem.com/membership_form_submit.php",
+          buildPhpUrl("membership_form_submit.php"),
           {
             method: "POST",
             body: formDataToSend,
@@ -638,7 +702,7 @@ export default function Membership() {
       }
 
       const response = await fetch(
-        "https://iaccs.agcinfosystem.com/membership_form_submit.php",
+        buildPhpUrl("membership_form_submit.php"),
         {
           method: "POST",
           body: formDataToSend,
@@ -1495,6 +1559,7 @@ function ThankYouSection({
     payment_status?: string;
     status?: string;
     download_url?: string;
+    message?: string;
   } | null;
   onRefresh?: () => void | Promise<void>;
   onNewApplication: () => void;
@@ -1543,6 +1608,15 @@ function ThankYouSection({
         )}
 
         <div className="mt-4 grid gap-3 w-full max-w-2xl">
+          {data?.message && (
+            <div className="rounded-lg bg-yellow-50 border border-yellow-200 px-5 py-4 text-sm text-yellow-900 text-left">
+              {data.message}
+              <div className="mt-2 text-yellow-900/80">
+                Tip: make sure the reference number exists in your database, then
+                click “Refresh Status”.
+              </div>
+            </div>
+          )}
           <StatusRow label="Application Status" value={data?.status} />
           <StatusRow label="Payment Status" value={data?.payment_status} />
           <StatusRow label="Membership ID" value={data?.membership_id} />

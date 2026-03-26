@@ -30,7 +30,7 @@ export function getDocumentsBaseUrlByHost(hostname?: string | null) {
     return "http://localhost/iaccs/documents_list.php";
   }
   if (host.endsWith("agcinfosystem.com")) {
-    return "https://iaccs.agcinfosystem.com/documents_list.php";
+    return "https://iaccs.org.in/documents_list.php";
   }
   return "/documents_list.php";
 }

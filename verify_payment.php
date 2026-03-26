@@ -121,7 +121,7 @@ if ($success === true) {
     
         $boundary = md5(time());
     
-        $headers  = "From: IACCS <noreply@iaccs.agcinfosystem.com>\r\n";
+        $headers  = "From: IACCS <noreply@iaccs.org.in>\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: multipart/related; boundary=\"$boundary\"\r\n";
     
@@ -133,7 +133,7 @@ Your application reference number is $reference_number. We are pleased to inform
 
 Upon confirmation of payment, your application will be reviewed. Membership approval and further communication will be shared with you within 3-5 working days.
 
-For any assistance or queries, please contact us at admin@iaccs.agcinfosystem.com. We'll get back to you promptly, usually within 1-2 working days.
+For any assistance or queries, please contact us at admin@iaccs.org.in. We'll get back to you promptly, usually within 1-2 working days.
 
 Thank you for choosing to join the ACCS community. We are excited to have you on board!
 
@@ -151,11 +151,11 @@ Association for Critical Care Sciences (ACCS)";
     }
 
     function send_admin_notification($form_data, $permanent_file_paths, $reference_number, $payment_id) {
-        $to       = 'admin@iaccs.agcinfosystem.com';
+        $to       = 'admin@iaccs.org.in';
         $subject  = 'New Membership Application (Documents Attached)';
         $boundary = md5(time());
     
-        $headers  = "From: IACCS <noreply@iaccs.agcinfosystem.com>\r\n";
+        $headers  = "From: IACCS <noreply@iaccs.org.in>\r\n";
         $headers .= "Reply-To: {$form_data['email']}\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n";

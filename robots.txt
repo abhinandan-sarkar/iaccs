@@ -28,4 +28,4 @@ Allow: /*.ico$
 
 # Sitemap (update URL if different)
 Allow: /sitemap.xml
-Sitemap: https://iaccs.agcinfosystem.com/sitemap.xml
+Sitemap: https://iaccs.org.in/sitemap.xml

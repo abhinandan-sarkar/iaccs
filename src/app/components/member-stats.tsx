@@ -13,7 +13,7 @@ function getCountsUrl() {
     return "http://localhost/iaccs/membership_counts.php";
   }
   if (host.endsWith("agcinfosystem.com")) {
-    return "https://iaccs.agcinfosystem.com/membership_counts.php";
+    return "https://iaccs.org.in/membership_counts.php";
   }
   return "/membership_counts.php";
 }

@@ -114,7 +114,7 @@ export default function Footer() {
           </svg>
 
           <address className="not-italic text-sm md:text-base leading-relaxed">
-            168, Mathkal, Nazrul Sarani, Dumdum<br />
+            Mathkal, Nazrul Sarani, Dumdum<br />
             Cantonment, Kolkata, 700065
           </address>
 

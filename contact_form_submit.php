@@ -47,15 +47,15 @@ if (!empty($errors)) {
     exit;
 }
 
-$to = 'admin@iaccs.agcinfosystem.com';
-$site = 'iaccs.agcinfosystem.com';
+$to = 'admin@iaccs.org.in';
+$site = 'iaccs.org.in';
 $subject = 'Contact Form Submission';
 $body = "You have received a new message from the $site contact form:\n\n"
       . "Name: $name\n"
       . "Email: $email\n\n"
       . "Subject: $msg_subject\n"
       . "Message:\n$message\n";
-$headers = "From: noreply@iaccs.agcinfosystem.com\r\n"
+$headers = "From: noreply@iaccs.org.in\r\n"
          . "Reply-To: $email\r\n"
          . "Content-Type: text/plain; charset=UTF-8\r\n";
 
